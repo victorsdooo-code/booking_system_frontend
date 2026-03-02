@@ -1218,15 +1218,21 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         }
 
         function submitBooking() {
+            // Read directly from form inputs
+            const name = document.getElementById('name')?.value || '';
+            const phone = document.getElementById('phone')?.value || '';
             
+            // Get selected service
+            const selectedService = document.querySelector('.option-card.selected');
+            const service = selectedService?.dataset?.value || '';
             
+            // Get selected date
+            const selectedDate = document.querySelector('.calendar-day.selected');
+            const date = selectedDate?.dataset?.date || new Date().toISOString().split('T')[0];
             
-            // Use the bookingData object which is already properly populated
-            const name = bookingData.name || '';
-            const phone = bookingData.phone || '';
-            const service = bookingData.service || '';
-            const date = bookingData.date ? bookingData.date.toISOString().split('T')[0] : '';
-            const time = bookingData.time || '10:00';
+            // Get selected time
+            const selectedTime = document.querySelector('.time-slot.selected');
+            const time = selectedTime?.dataset?.time || '10:00';
             
             const serviceMap = {
                 '中醫師 - 問診': 1,
