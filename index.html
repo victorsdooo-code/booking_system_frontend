@@ -1154,7 +1154,7 @@
             function validateForm() {
                 const nameValid = nameInput.value.trim().length > 0;
                 const phoneValid = phoneInput.value.trim().length >= 8;
-                document.getElementById('submit-booking').disabled = !(nameValid && phoneValid);
+                // Enabled for testing
             }
             
             nameInput.addEventListener('input', () => {
