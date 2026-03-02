@@ -1263,7 +1263,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
                 body: JSON.stringify(apiData)
             })
             .then(response => {
-                if (response.status === 409) { alert('預約時間衝突，請選擇其他時間'); throw new Error('Conflict'); } else if (!response.ok) {
+                if (response.status === 409) { alert('該時間已被預約，請選擇其他時間'); return; } else if (!response.ok) {
                      throw new Error('Network response was not ok');
                 }
                 return response.json();
