@@ -1243,7 +1243,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
                 time: time
             };
             
-            console.log('Submitting:', apiData);
+            console.log('Submitting:', apiData); console.log('API_BASE:', API_BASE); alert('Submitting: ' + JSON.stringify(apiData));
             
             // Show loading state
             const submitBtn = document.getElementById('submit-booking');
