@@ -1175,7 +1175,7 @@
             });
             
             // Submit button click handler - clean and direct
-            submitBtn.addEventListener('click', () => {
+            submitBtn.addEventListener('click', () => { submitBtn.disabled = false;
                 console.log('Submit button clicked!');
                 if (validateForm()) {
                     submitBooking();
