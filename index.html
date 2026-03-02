@@ -344,7 +344,7 @@
             font-size: 14px;
         }
 
-        .calendar-day:hover:not(.data-disabled-temp):not(.selected) {
+        .calendar-day:hover:not(.disabled):not(.selected) {
             background: var(--accent-light);
         }
 
@@ -353,7 +353,7 @@
             color: white;
         }
 
-        .calendar-day.data-disabled-temp {
+        .calendar-day.disabled {
             color: var(--border);
             cursor: not-allowed;
         }
@@ -387,7 +387,7 @@
             font-weight: 500;
         }
 
-        .time-slot:hover:not(.data-disabled-temp) {
+        .time-slot:hover:not(.disabled) {
             border-color: var(--accent);
         }
 
@@ -397,7 +397,7 @@
             border-color: var(--primary);
         }
 
-        .time-slot.data-disabled-temp {
+        .time-slot.disabled {
             background: #f5f5f5;
             color: #ccc;
             cursor: not-allowed;
@@ -475,7 +475,7 @@
             color: var(--primary);
         }
 
-        .btn:data-disabled-temp {
+        .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -757,7 +757,7 @@
                 <p>專業中藥調配與諮詢</p>
             </div>
             <div class="btn-group">
-                <button class="btn btn-primary" id="step1-next" data-disabled-temp>下一步</button>
+                <button class="btn btn-primary" id="step1-next" disabled>下一步</button>
             </div>
         </div>
 
@@ -796,7 +796,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step2-prev">上一步</button>
-                <button class="btn btn-primary" id="step2-next" data-disabled-temp>下一步</button>
+                <button class="btn btn-primary" id="step2-next" disabled>下一步</button>
             </div>
         </div>
 
@@ -827,7 +827,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step3-prev">上一步</button>
-                <button class="btn btn-primary" id="step3-next" data-disabled-temp>下一步</button>
+                <button class="btn btn-primary" id="step3-next" disabled>下一步</button>
             </div>
         </div>
 
@@ -849,7 +849,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step4-prev">上一步</button>
-                <button class="btn btn-primary" id="step4-next" data-disabled-temp>下一步</button>
+                <button class="btn btn-primary" id="step4-next" disabled>下一步</button>
             </div>
         </div>
 
@@ -876,7 +876,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step5-prev">上一步</button>
-                <button class="btn btn-primary" id="submit-booking" data-disabled-temp>確認預約</button>
+                <button class="btn btn-primary" id="submit-booking" disabled>確認預約</button>
             </div>
         </div>
 
@@ -1015,11 +1015,11 @@
                     // Update booking data
                     if (step === '1') {
                         bookingData.clinic = card.dataset.value;
-                        document.getElementById('step1-next').data-disabled-temp = false;
+                        document.getElementById('step1-next').disabled = false;
                     } else if (step === '2') {
                         bookingData.service = card.dataset.value;
                         bookingData.duration = card.dataset.duration;
-                        document.getElementById('step2-next').data-disabled-temp = false;
+                        document.getElementById('step2-next').disabled = false;
                     }
                 });
             });
@@ -1077,14 +1077,14 @@
                 
                 // Past dates
                 if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-                    cell.classList.add('data-disabled-temp');
+                    cell.classList.add('disabled');
                 } else {
                     cell.addEventListener('click', () => {
                         document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected'));
                         cell.classList.add('selected');
                         bookingData.date = date;
                         selectedDate = date;
-                        document.getElementById('step3-next').data-disabled-temp = false;
+                        document.getElementById('step3-next').disabled = false;
                     });
                 }
                 
@@ -1113,13 +1113,13 @@
                 
                 // Randomly disable some slots for demo
                 if (Math.random() < 0.3) {
-                    slot.classList.add('data-disabled-temp');
+                    slot.classList.add('disabled');
                 } else {
                     slot.addEventListener('click', () => {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
                         slot.classList.add('selected');
                         bookingData.time = time;
-                        document.getElementById('step4-next').data-disabled-temp = false;
+                        document.getElementById('step4-next').disabled = false;
                     });
                 }
                 
@@ -1167,7 +1167,10 @@
                 bookingData.phone = phoneInput.value;
             });
             
-            document.getElementById('submit-booking').addEventListener('click', submitBooking);
+            document.getElementById('submit-booking').addEventListener('click', function() {
+    this.disabled = false;
+    submitBooking();
+});
             document.getElementById('new-booking').addEventListener('click', resetBooking);
         }
 
@@ -1285,10 +1288,10 @@
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
             
-            document.getElementById('step1-next').data-disabled-temp = true;
-            document.getElementById('step2-next').data-disabled-temp = true;
-            document.getElementById('step3-next').data-disabled-temp = true;
-            document.getElementById('step4-next').data-disabled-temp = true;
+            document.getElementById('step1-next').disabled = true;
+            document.getElementById('step2-next').disabled = true;
+            document.getElementById('step3-next').disabled = true;
+            document.getElementById('step4-next').disabled = true;
             
             
             // Reset to step 1
