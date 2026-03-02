@@ -1,234 +1,108 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>青苗綜合醫療診所 - 管理後台</title>
-<style>
-:root{--primary:#2D5A3D;--primary-light:#4A7C59;--primary-dark:#1E3D2A;--accent:#7CB68E;--accent-light:#A8D5B5;--background:#F8FAF9;--card-bg:#FFFFFF;--text:#1A1A1A;--text-light:#666666;--border:#E0E5E2;--danger:#E53935}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Helvetica Neue','PingFang HK','Microsoft YaHei',sans-serif}
-body{background:var(--background);color:var(--text);min-height:100vh}
-.login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%)}
-.login-box{background:var(--card-bg);padding:48px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:100%;max-width:400px;text-align:center}
-.login-box h1{color:var(--primary);font-size:24px;margin-bottom:8px}
-.login-box .subtitle{color:var(--text-light);margin-bottom:32px}
-.login-box input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:8px;font-size:16px;margin-bottom:16px}
-.login-box input:focus{outline:none;border-color:var(--primary)}
-.login-box button{width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer}
-.login-box button:hover{background:var(--primary-light)}
-.login-error{color:var(--danger);margin-top:12px;font-size:14px;display:none}
-.admin-container{display:none;min-height:100vh}
-.admin-container.active{display:flex}
-.sidebar{width:260px;background:linear-gradient(180deg,var(--primary-dark) 0%,var(--primary) 100%);min-height:100vh;padding:24px 0;position:fixed;left:0;top:0}
-.sidebar-header{text-align:center;padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:24px}
-.sidebar-header h2{color:white;font-size:20px;margin-bottom:4px}
-.sidebar-header p{color:var(--accent-light);font-size:12px}
-.nav-menu{list-style:none}
-.nav-menu li{margin-bottom:4px}
-.nav-menu button{width:100%;padding:14px 24px;background:transparent;border:none;color:rgba(255,255,255,0.7);font-size:15px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px}
-.nav-menu button:hover{background:rgba(255,255,255,0.1);color:white}
-.nav-menu button.active{background:rgba(255,255,255,0.15);color:white;border-left:3px solid var(--accent)}
-.nav-icon{font-size:18px}
-.sidebar-footer{position:absolute;bottom:24px;left:0;right:0;padding:0 24px}
-.logout-btn{width:100%;padding:12px;background:rgba(255,255,255,0.1);border:none;color:white;border-radius:8px;cursor:pointer}
-.logout-btn:hover{background:rgba(255,255,255,0.2)}
-.main-content{flex:1;margin-left:260px;padding:32px}
-.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
-.page-header h1{color:var(--primary-dark);font-size:28px}
-.version-tag{background:var(--primary);color:white;padding:6px 12px;border-radius:20px;font-size:12px}
-.card{background:var(--card-bg);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px;margin-bottom:24px}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.card-header h3{color:var(--primary-dark);font-size:18px}
-.btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.btn-primary{background:var(--primary);color:white}
-.btn-primary:hover{background:var(--primary-light)}
-.btn-danger{background:var(--danger);color:white}
-.btn-secondary{background:var(--border);color:var(--text)}
-.data-table{width:100%;border-collapse:collapse}
-.data-table th,.data-table td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--border)}
-.data-table th{background:var(--background);color:var(--text-light);font-weight:600;font-size:13px;text-transform:uppercase}
-.data-table tr:hover{background:var(--background)}
-.status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
-.status-confirmed{background:#E8F5E9;color:#2E7D32}
-.status-pending{background:#FFF3E0;color:#E65100}
-.status-cancelled{background:#FFEBEE;color:#C62828}
-.action-btns{display:flex;gap:8px}
-.action-btns button{padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer;border:none}
-.btn-edit{background:var(--accent-light);color:var(--primary-dark)}
-.btn-cancel-action{background:#FFEBEE;color:var(--danger)}
-.form-group{margin-bottom:20px}
-.form-group label{display:block;margin-bottom:8px;font-weight:600}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:8px;font-size:15px}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}
-.modal{background:var(--card-bg);border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
-.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-header h3{color:var(--primary-dark)}
-.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-light)}
-.modal-body{padding:24px}
-.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:12px}
-.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
-.schedule-day{background:var(--background);border-radius:8px;padding:16px;min-height:150px}
-.schedule-day h4{color:var(--primary);font-size:14px;text-align:center;margin-bottom:12px}
-.schedule-slot{background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:8px;font-size:12px}
-.schedule-slot .time{color:var(--primary);font-weight:600}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px}
-.stat-card{background:var(--card-bg);border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
-.stat-card h4{color:var(--text-light);font-size:13px;margin-bottom:8px}
-.stat-card .value{color:var(--primary-dark);font-size:32px;font-weight:700}
-.filter-bar{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
-.filter-bar select,.filter-bar input{padding:10px 16px;border:2px solid var(--border);border-radius:8px;font-size:14px}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-light)}
-.page-section{display:none}
-.page-section.active{display:block}
-.loading{text-align:center;padding:40px;color:var(--text-light)}
-.search-box{position:relative;flex:1;max-width:300px}
-.search-box input{width:100%;padding:10px 16px 10px 40px;border:2px solid var(--border);border-radius:8px}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-light)}
-@media(max-width:1024px){.sidebar{width:80px}.sidebar-header h2,.sidebar-header p,.nav-menu button span:not(.nav-icon){display:none}.nav-menu button{justify-content:center}.main-content{margin-left:80px}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.sidebar{display:none}.main-content{margin-left:0}.form-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr}.schedule-grid{grid-template-columns:1fr}}
-</style>
+    <meta charset="UTF-8">
+    <title>青苗綜合醫療診所 - 管理後台</title>
+    <style>
+        :root { --primary: #2D5A3D; --primary-light: #4A7C59; --danger: #dc3545; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary), #1E3D2A); }
+        .login-box { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .login-box h1 { color: var(--primary); text-align: center; margin-bottom: 8px; }
+        .login-box input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 16px; font-size: 16px; }
+        .login-box button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .login-box button:hover { background: var(--primary-light); }
+        .login-error { color: var(--danger); text-align: center; margin-top: 12px; display: none; }
+        
+        .admin-container { display: none; min-height: 100vh; }
+        .admin-container.active { display: flex; }
+        .sidebar { width: 240px; background: var(--primary); color: white; padding: 20px; }
+        .sidebar h2 { margin-bottom: 20px; }
+        .nav-btn { width: 100%; padding: 12px; background: transparent; border: none; color: white; text-align: left; cursor: pointer; margin-bottom: 8px; border-radius: 6px; }
+        .nav-btn.active, .nav-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        .main { flex: 1; padding: 24px; overflow-y: auto; }
+        h1 { margin-bottom: 24px; }
+        
+        table { width: 100%; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: var(--primary); color: white; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+    </style>
 </head>
 <body>
-<div class="login-container" id="loginPage">
-<div class="login-box">
-<h1>青苗綜合醫療診所</h1>
-<p class="subtitle">管理後台登入</p>
-<input type="password" id="password" placeholder="請輸入密碼" onkeypress="if(event.key==='Enter')login()">
-<button onclick="login()">登入</button>
-<p class="login-error" id="loginError">密碼錯誤，請重試</p>
-</div>
-</div>
-<div class="admin-container" id="adminContainer">
-<nav class="sidebar">
-<div class="sidebar-header"><h2>管理後台</h2><p>青苗綜合醫療診所</p></div>
-<ul class="nav-menu">
-<li><button class="active" onclick="showSection('dashboard',this)"><span class="nav-icon">📊</span><span>總覽</span></button></li>
-<li><button onclick="showSection('bookings',this)"><span class="nav-icon">📅</span><span>預約列表</span></button></li>
-<li><button onclick="showSection('add-booking',this)"><span class="nav-icon">➕</span><span>新增預約</span></button></li>
-<li><button onclick="showSection('schedule',this)"><span class="nav-icon">👨‍⚕️</span><span>醫生排班</span></button></li>
-</ul>
-<div class="sidebar-footer"><button class="logout-btn" onclick="logout()">登出</button></div>
-</nav>
-<main class="main-content">
-<section class="page-section active" id="dashboard">
-<div class="page-header"><h1>總覽</h1><span class="version-tag">v0.2.0</span></div>
-<div class="stats-grid">
-<div class="stat-card"><h4>今日預約</h4><div class="value" id="todayBookings">0</div></div>
-<div class="stat-card"><h4>本週預約</h4><div class="value" id="weekBookings">0</div></div>
-<div class="stat-card"><h4>待確認</h4><div class="value" id="pendingBookings">0</div></div>
-<div class="stat-card"><h4>本月總預約</h4><div class="value" id="monthBookings">0</div></div>
-</div>
-<div class="card">
-<div class="card-header"><h3>最近預約</h3><button class="btn btn-primary" onclick="showSection('bookings',event.target)">查看全部</button></div>
-<table class="data-table"><thead><tr><th>日期</th><th>時間</th><th>病人姓名</th><th>服務類型</th><th>狀態</th></tr></thead><tbody id="recentBookings"><tr><td colspan="5" class="loading">載入中...</td></tr></tbody></table>
-</div>
-</section>
-<section class="page-section" id="bookings">
-<div class="page-header"><h1>預約列表</h1><span class="version-tag">v0.2.0</span></div>
-<div class="filter-bar">
-<div class="search-box"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="搜尋病人姓名或電話..." oninput="filterBookings()"></div>
-<select id="statusFilter" onchange="filterBookings()"><option value="">全部狀態</option><option value="confirmed">已確認</option><option value="pending">待確認</option><option value="cancelled">已取消</option></select>
-<select id="serviceFilter" onchange="filterBookings()"><option value="">全部服務</option><option value="中醫師">中醫師</option><option value="物理治療師">物理治療師</option><option value="中醫正骨師">中醫正骨師</option></select>
-<input type="date" id="dateFilter" onchange="filterBookings()">
-</div>
-<div class="card"><table class="data-table"><thead><tr><th>編號</th><th>日期</th><th>時間</th><th>病人姓名</th><th>電話</th><th>服務</th><th>診所</th><th>狀態</th><th>操作</th></tr></thead><tbody id="bookingsTable"><tr><td colspan="9" class="loading">載入中...</td></tr></tbody></table></div>
-</section>
-<section class="page-section" id="add-booking">
-<div class="page-header"><h1>新增預約</h1><span class="version-tag">v0.2.0</span></div>
-<div class="card">
-<form id="addBookingForm" onsubmit="submitBooking(event)">
-<div class="form-row">
-<div class="form-group"><label>病人姓名 *</label><input type="text" name="patientName" required placeholder="請輸入姓名"></div>
-<div class="form-group"><label>聯絡電話 *</label><input type="tel" name="phone" required placeholder="請輸入電話"></div>
-</div>
-<div class="form-row">
-<div class="form-group"><label>選擇診所 *</label><select name="clinic" required><option value="">請選擇診所</option><option value="青苗綜合醫療診所">青苗綜合醫療診所</option><option value="青苗中藥房">青苗中藥房</option></select></div>
-<div class="form-group"><label>服務類型 *</label><select name="service" required onchange="updateTimeSlots()"><option value="">請選擇服務</option><option value="中醫師">中醫師 (問診15分鐘)</option><option value="物理治療師">物理治療師 (60分鐘)</option><option value="中醫正骨師">中醫正骨師 (60分鐘)</option></select></div>
-</div>
-<div class="form-row">
-<div class="form-group"><label>選擇日期 *</label><input type="date" name="date" required onchange="updateTimeSlots()"></div>
-<div class="form-group"><label>選擇時間 *</label><select name="time" required id="timeSlotSelect"><option value="">請先選擇日期和服務</option></select></div>
-</div>
-<div class="form-group"><label>備註</label><textarea name="notes" rows="3" placeholder="可選：備註事項"></textarea></div>
-<div style="text-align:right"><button type="button" class="btn btn-secondary" onclick="resetForm()">重設</button><button type="submit" class="btn btn-primary">確認新增預約</button></div>
-</form>
-</div>
-</section>
-<section class="page-section" id="schedule">
-<div class="page-header"><h1>醫生排班</h1><span class="version-tag">v0.2.0</span></div>
-<div class="filter-bar">
-<select id="doctorFilter" onchange="loadSchedule()"><option value="">全部醫生</option><option value="中醫師">中醫師</option><option value="物理治療師">物理治療師</option><option value="中醫正骨師">中醫正骨師</option></select>
-<input type="date" id="scheduleDate" onchange="loadSchedule()">
-</div>
-<div class="card"><div class="schedule-grid" id="scheduleGrid"></div></div>
-</section>
-</main>
-</div>
-<div class="modal-overlay" id="editModal">
-<div class="modal">
-<div class="modal-header"><h3>修改預約</h3><button class="modal-close" onclick="closeModal('editModal')">&times;</button></div>
-<div class="modal-body">
-<form id="editBookingForm">
-<input type="hidden" id="editId">
-<div class="form-group"><label>病人姓名</label><input type="text" id="editPatientName" required></div>
-<div class="form-group"><label>聯絡電話</label><input type="tel" id="editPhone" required></div>
-<div class="form-row">
-<div class="form-group"><label>日期</label><input type="date" id="editDate" required></div>
-<div class="form-group"><label>時間</label><select id="editTime" required></select></div>
-</div>
-<div class="form-group"><label>狀態</label><select id="editStatus" required><option value="pending">待確認</option><option value="confirmed">已確認</option><option value="cancelled">已取消</option></select></div>
-<div class="form-group"><label>備註</label><textarea id="editNotes" rows="2"></textarea></div>
-</form>
-</div>
-<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('editModal')">取消</button><button class="btn btn-primary" onclick="saveEdit()">儲存變更</button></div>
-</div>
-</div>
-<div class="modal-overlay" id="cancelModal">
-<div class="modal" style="max-width:400px">
-<div class="modal-header"><h3>確認取消</h3><button class="modal-close" onclick="closeModal('cancelModal')">&times;</button></div>
-<div class="modal-body"><p>確定要取消此預約嗎？</p><p id="cancelBookingInfo" style="margin-top:12px;color:var(--text-light)"></p></div>
-<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('cancelModal')">保留</button><button class="btn btn-danger" onclick="confirmCancel()">確認取消</button></div>
-</div>
-</div>
-<script>
-const API_BASE='https://booking-system-backend-2t8v.onrender.com/api';
-const VERSION='v0.2.0';
-const ADMIN_PASSWORD='admin123';
-let mockBookings=[
-{id:'BK001',date:'2026-03-02',time:'09:00',patientName:'陳大文',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
-{id:'BK002',date:'2026-03-02',time:'10:00',patientName:'李小明',phone:'98765432',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:'腰背痛'},
-{id:'BK003',date:'2026-03-02',time:'11:00',patientName:'張小紅',phone:'91234567',service:'中醫正骨師',clinic:'青苗中藥房',status:'pending',notes:''},
-{id:'BK004',date:'2026-03-03',time:'09:00',patientName:'林小明',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
-{id:'BK005',date:'2026-03-03',time:'14:00',patientName:'黃小華',phone:'98765432',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'pending',notes:''},
-{id:'BK006',date:'2026-03-04',time:'10:00',patientName:'王小美',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
-{id:'BK007',date:'2026-03-04',time:'15:00',patientName:'劉大偉',phone:'98765432',service:'中醫正骨師',clinic:'青苗中藥房',status:'cancelled',notes:'客戶取消'},
-{id:'BK008',date:'2026-03-05',time:'11:00',patientName:'陳小玲',phone:'91234567',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''}];
-let allBookings=[...mockBookings];
-let cancelBookingId=null;
-const timeSlots={'中醫師':['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'],'物理治療師':['09:00','10:30','14:00','15:30','17:00'],'中醫正骨師':['09:00','11:00','14:00','16:00']};
-function login(){const pwd=document.getElementById('password').value;if(pwd===ADMIN_PASSWORD){document.getElementById('loginPage').style.display='none';document.getElementById('adminContainer').classList.add('active');loadDashboard();loadBookings();loadSchedule();}else{document.getElementById('loginError').style.display='block';}}
-function logout(){document.getElementById('adminContainer').classList.remove('active');document.getElementById('loginPage').style.display='flex';document.getElementById('password').value='';document.getElementById('loginError').style.display='none';}
-function showSection(id,btn){document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(btn){document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}}
-function getWeekStart(){const n=new Date(),d=n.getDay(),diff=n.getDate()-d+(d===0?-6:1);return new Date(n.setDate(diff)).toISOString().split('T')[0];}
-function getWeekEnd(){const n=new Date(),d=n.getDay(),diff=n.getDate()-d+(d===0?0:7);return new Date(n.setDate(diff)).toISOString().split('T')[0];}
-function formatDate(s){return new Date(s).toLocaleDateString('zh-HK',{month:'short',day:'numeric'});}
-function getStatusText(s){return{'confirmed':'已確認','pending':'待確認','cancelled':'已取消'}[s]||s;}
-function loadDashboard(){const today=new Date().toISOString().split('T')[0],ws=getWeekStart(),we=getWeekEnd(),ms=today.substring(0,7)+'-01';document.getElementById('todayBookings').textContent=allBookings.filter(b=>b.date===today&&b.status!=='cancelled').length;document.getElementById('weekBookings').textContent=allBookings.filter(b=>b.date>=ws&&b.date<=we&&b.status!=='cancelled').length;document.getElementById('pendingBookings').textContent=allBookings.filter(b=>b.status==='pending').length;document.getElementById('monthBookings').textContent=allBookings.filter(b=>b.date>=ms&&b.status!=='cancelled').length;const rb=allBookings.filter(b=>b.status!=='cancelled').sort((a,b)=>new Date(b.date+' '+b.time)-new Date(a.date+' '+a.time)).slice(0,5);document.getElementById('recentBookings').innerHTML=rb.length?rb.map(b=>'<tr><td>'+formatDate(b.date)+'</td><td>'+b.time+'</td><td>'+b.patientName+'</td><td>'+b.service+'</td><td><span class="status-badge status-'+b.status+'">'+getStatusText(b.status)+'</span></td></tr>').join(''):'<tr><td colspan="5" class="empty-state">暫無預約</td></tr>';}
-function loadBookings(){renderBookingsTable(allBookings);}
-function renderBookingsTable(bs){const tbody=document.getElementById('bookingsTable');if(!bs.length){tbody.innerHTML='<tr><td colspan="9" class="empty-state">暫無預約資料</td></tr>';return;}const sorted=[...bs].sort((a,b)=>new Date(b.date+' '+b.time)-new Date(a.date+' '+a.time));tbody.innerHTML=sorted.map(b=>'<tr><td>'+b.id+'</td><td>'+formatDate(b.date)+'</td><td>'+b.time+'</td><td>'+b.patientName+'</td><td>'+b.phone+'</td><td>'+b.service+'</td><td>'+b.clinic+'</td><td><span class="status-badge status-'+b.status+'">'+getStatusText(b.status)+'</span></td><td class="action-btns"><button class="btn-edit" onclick="openEdit(''+b.id+'')">修改</button>'+(b.status!=='cancelled'?'<button class="btn-cancel-action" onclick="openCancel(''+b.id+'')">取消</button>':'')+'</td></tr>').join('');}
-function filterBookings(){const s=document.getElementById('searchInput').value.toLowerCase(),st=document.getElementById('statusFilter').value,sv=document.getElementById('serviceFilter').value,d=document.getElementById('dateFilter').value;renderBookingsTable(allBookings.filter(b=>(!s||b.patientName.toLowerCase().includes(s)||b.phone.includes(s))&&(!st||b.status===st)&&(!sv||b.service===sv)&&(!d||b.date===d)));}
-function updateTimeSlots(){const svc=document.querySelector('select[name="service"]').value,dt=document.querySelector('input[name="date"]').value,sel=document.getElementById('timeSlotSelect');sel.innerHTML='<option value="">請選擇時間</option>';if(!svc||!dt)return;const slots=timeSlots[svc]||[],booked=allBookings.filter(b=>b.date===dt&&b.service===svc&&b.status!=='cancelled').map(b=>b.time);slots.forEach(t=>{const opt=document.createElement('option');opt.value=t;opt.textContent=booked.includes(t)?t+' (已預約)':t;if(booked.includes(t))opt.disabled=true;sel.appendChild(opt);});}
-function submitBooking(e){e.preventDefault();const f=e.target,nb={id:'BK'+String(allBookings.length+1).padStart(3,'0'),date:f.date.value,time:f.time.value,patientName:f.patientName.value,phone:f.phone.value,service:f.service.value,clinic:f.clinic.value,status:'pending',notes:f.notes.value};allBookings.push(nb);resetForm();alert('預約新增成功！');loadDashboard();loadBookings();loadSchedule();}
-function resetForm(){document.getElementById('addBookingForm').reset();document.getElementById('timeSlotSelect').innerHTML='<option value="">請先選擇日期和服務</option>';}
-function openEdit(id){const b=allBookings.find(x=>x.id===id);if(!b)return;document.getElementById('editId').value=id;document.getElementById('editPatientName').value=b.patientName;document.getElementById('editPhone').value=b.phone;document.getElementById('editDate').value=b.date;document.getElementById('editStatus').value=b.status;document.getElementById('editNotes').value=b.notes||'';const et=document.getElementById('editTime');et.innerHTML='';(timeSlots[b.service]||[]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;o.selected=t===b.time;et.appendChild(o);});document.getElementById('editModal').classList.add('active');}
-function saveEdit(){const id=document.getElementById('editId').value,b=allBookings.find(x=>x.id===id);if(b){b.patientName=document.getElementById('editPatientName').value;b.phone=document.getElementById('editPhone').value;b.date=document.getElementById('editDate').value;b.time=document.getElementById('editTime').value;b.status=document.getElementById('editStatus').value;b.notes=document.getElementById('editNotes').value;}closeModal('editModal');loadDashboard();loadBookings();loadSchedule();alert('預約已更新！');}
-function openCancel(id){cancelBookingId=id;const b=allBookings.find(x=>x.id===id);document.getElementById('cancelBookingInfo').textContent=b?b.patientName+' - '+formatDate(b.date)+' '+b.time:'';document.getElementById('cancelModal').classList.add('active');}
-function confirmCancel(){if(cancelBookingId){const b=allBookings.find(x=>x.id===cancelBookingId);if(b)b.status='cancelled';}closeModal('cancelModal');loadDashboard();loadBookings();loadSchedule();}
-function closeModal(id){document.getElementById(id).classList.remove('active');}
-function loadSchedule(){const df=document.getElementById('doctorFilter').value,sd=document.getElementById('scheduleDate').value,grid=document.getElementById('scheduleGrid');const start=sd||new Date().toISOString().split('T')[0],days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}grid.innerHTML=days.map(d=>{const dayBookings=allBookings.filter(b=>b.date===d&&b.status!=='cancelled'&&(!df||b.service===df)).sort((a,b)=>a.time.localeCompare(b.time));const dayName=new Date(d).toLocaleDateString('zh-HK',{weekday:'short'});return'<div class="schedule-day"><h4>'+dayName+'</h4>'+(dayBookings.length?dayBookings.map(b=>'<div class="schedule-slot"><div class="time">'+b.time+'</div><div class="patient">'+b.patientName+'</div><div class="service">'+b.service+'</div></div>').join(''):'<p style="color:var(--text-light);font-size:12px;text-align:center">無預約</p>')+'</div>';}).join('');}
-</script>
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <h1>青苗綜合醫療診所</h1>
+            <p style="text-align:center;color:#666;margin-bottom:20px">管理後台登入</p>
+            <input type="password" id="password" placeholder="請輸入密碼">
+            <button onclick="login()">登入</button>
+            <p class="login-error" id="loginError">密碼錯誤，請重試</p>
+        </div>
+    </div>
+    
+    <div class="admin-container" id="adminContainer">
+        <div class="sidebar">
+            <h2>管理後台</h2>
+            <button class="nav-btn active" onclick="showSection('bookings')">📅 預約列表</button>
+            <button class="nav-btn" onclick="logout()">🚪 登出</button>
+        </div>
+        <div class="main">
+            <h1>預約列表</h1>
+            <table>
+                <thead><tr><th>ID</th><th>日期</th><th>時間</th><th>姓名</th><th>電話</th><th>服務</th><th>狀態</th></tr></thead>
+                <tbody id="bookingsTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://booking-system-backend-2t8v.onrender.com/api';
+        const ADMIN_PASSWORD = 'admin123';
+        
+        function login() {
+            var pwd = document.getElementById('password').value;
+            if(pwd === ADMIN_PASSWORD) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('adminContainer').classList.add('active');
+                loadBookings();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+        
+        function logout() {
+            document.getElementById('adminContainer').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'flex';
+        }
+        
+        function showSection(id) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        async function loadBookings() {
+            const tbody = document.getElementById('bookingsTable');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">載入中...</td></tr>';
+            try {
+                const res = await fetch(API_BASE + '/admin/appointments?token=' + ADMIN_PASSWORD);
+                const data = await res.json();
+                const bookings = data.appointments || data;
+                if(bookings.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">暫無預約</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = bookings.map(b => 
+                    '<tr><td>' + b.id + '</td><td>' + b.date + '</td><td>' + b.time + '</td><td>' + (b.name || b.patientName) + '</td><td>' + b.phone + '</td><td>' + (b.doctorName || '') + '</td><td>' + (b.status || 'confirmed') + '</td></tr>'
+                ).join('');
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">載入失敗: ' + e.message + '</td></tr>';
+            }
+        }
+    </script>
 </body>
 </html>
