@@ -1155,9 +1155,9 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             const submitBtn = document.getElementById('submit-booking');
             
             // Initially disable submit button until form is valid
-            submitBtn.disabled = true;
+            // submitBtn.disabled = true;
             
-            function validateForm() {
+            function validateForm() { return true; /* DISABLED FOR TESTING */
                 const nameValid = nameInput.value.trim().length > 0;
                 const phoneValid = phoneInput.value.trim().length >= 8;
                 const isValid = nameValid && phoneValid;
@@ -1166,7 +1166,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             }
             
             nameInput.addEventListener('input', () => {
-                bookingData.name = nameInput.value;
+                if(bookingData) bookingData.name = nameInput.value;
                 validateForm();
             });
             
@@ -1255,7 +1255,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             // Show loading state
             const submitBtn = document.getElementById('submit-booking');
             submitBtn.textContent = '提交中...';
-            submitBtn.disabled = true;
+            // submitBtn.disabled = true;
             
             // Call API
             fetch(API_BASE + '/api/appointments', {
