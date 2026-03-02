@@ -202,7 +202,7 @@ console.log('Admin loaded'); window.onload = function() { console.log('Window lo
     var pwd = document.getElementById('password').value;
     if(pwd === ADMIN_PASSWORD) {
         document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('adminContainer').classList.add('active');
+        document.getElementById('adminContainer').classList.add('active'); loadDashboard(); loadBookings(); loadSchedule();
         loadDashboard();
         loadBookings();
         loadSchedule();
