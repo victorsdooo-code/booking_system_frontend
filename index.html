@@ -1151,30 +1151,41 @@
             // Form validation
             const nameInput = document.getElementById('name');
             const phoneInput = document.getElementById('phone');
+            const submitBtn = document.getElementById('submit-booking');
+            
+            // Initially disable submit button until form is valid
+            submitBtn.disabled = true;
             
             function validateForm() {
                 const nameValid = nameInput.value.trim().length > 0;
                 const phoneValid = phoneInput.value.trim().length >= 8;
-                document.getElementById('submit-booking').disabled = !(nameValid && phoneValid);
-                // Enabled for testing
+                const isValid = nameValid && phoneValid;
+                submitBtn.disabled = !isValid;
+                return isValid;
             }
             
             nameInput.addEventListener('input', () => {
-                validateForm();
                 bookingData.name = nameInput.value;
+                validateForm();
             });
             
             phoneInput.addEventListener('input', () => {
-                validateForm();
                 bookingData.phone = phoneInput.value;
+                validateForm();
             });
             
-            document.getElementById('submit-booking').addEventListener('click', function() {
-    submitBooking();
-});
+            // Submit button click handler - clean and direct
+            submitBtn.addEventListener('click', () => {
+                console.log('Submit button clicked!');
+                if (validateForm()) {
+                    submitBooking();
+                } else {
+                    alert('請填寫姓名和電話');
+                }
+            });
+            
             document.getElementById('new-booking').addEventListener('click', resetBooking);
         }
-
         function goToStep(step) {
             // Hide current step
             document.querySelector('.booking-step[data-step="' + currentStep + '"]').classList.remove('active');
