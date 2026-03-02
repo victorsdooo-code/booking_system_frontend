@@ -1209,15 +1209,36 @@
         }
 
         function submitBooking() {
-            // Submit to API
+            console.log('Submit clicked!');
+            console.log('bookingData:', typeof bookingData, bookingData);
+            
+            // Get data directly from DOM to ensure we have it
+            const name = document.getElementById('name')?.value || '';
+            const phone = document.getElementById('phone')?.value || '';
+            
+            // Find selected service
+            const selectedService = document.querySelector('.option-card.selected');
+            const service = selectedService?.dataset?.value || '';
+            
+            // Find selected date
+            const selectedDateEl = document.querySelector('.calendar-day.selected');
+            const date = selectedDateEl?.dataset?.date || new Date().toISOString().split('T')[0];
+            
+            // Find selected time  
+            const selectedTimeEl = document.querySelector('.time-slot.selected');
+            const time = selectedTimeEl?.dataset?.time || '10:00';
+            
             const serviceMap = {'中醫-問診': 1, '中醫-治療': 2, '物理治療': 5, '中醫正骨': 6};
+            
             const apiData = {
-                name: bookingData.name,
-                phone: bookingData.phone,
-                doctorId: serviceMap[bookingData.service] || 1,
-                date: bookingData.date.toISOString().split('T')[0],
-                time: bookingData.time
+                name: name,
+                phone: phone,
+                doctorId: serviceMap[service] || 1,
+                date: date,
+                time: time
             };
+            
+            console.log('Submitting:', apiData);
             
             // Call API
             fetch(API_BASE + '/api/appointments', {
@@ -1226,10 +1247,14 @@
                 body: JSON.stringify(apiData)
             }).then(r => r.json()).then(d => {
                 console.log('Booking saved:', d);
-            }).catch(e => console.log('API error:', e));
+                alert('預約成功！');
+            }).catch(e => {
+                console.log('API error:', e);
+                alert('錯誤: ' + e.message);
+            });
             
-            // Update confirmation
-            document.getElementById('confirm-clinic').textContent = bookingData.clinic;
+            // Update confirmation (fallback)
+            document.getElementById('confirm-clinic').textContent = '青苗綜合醫療診所';
             document.getElementById('confirm-service').textContent = bookingData.service;
             
             const dateStr = bookingData.date.toLocaleDateString('zh-HK', { 
