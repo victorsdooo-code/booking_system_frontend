@@ -1209,6 +1209,25 @@
         }
 
         function submitBooking() {
+            // Submit to API
+            const serviceMap = {'中醫-問診': 1, '中醫-治療': 2, '物理治療': 5, '中醫正骨': 6};
+            const apiData = {
+                name: bookingData.name,
+                phone: bookingData.phone,
+                doctorId: serviceMap[bookingData.service] || 1,
+                date: bookingData.date.toISOString().split('T')[0],
+                time: bookingData.time
+            };
+            
+            // Call API
+            fetch(API_BASE + '/api/appointments', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(apiData)
+            }).then(r => r.json()).then(d => {
+                console.log('Booking saved:', d);
+            }).catch(e => console.log('API error:', e));
+            
             // Update confirmation
             document.getElementById('confirm-clinic').textContent = bookingData.clinic;
             document.getElementById('confirm-service').textContent = bookingData.service;
@@ -1258,7 +1277,10 @@
         }
     </script>
 
-        // Mock API Data (for demo without backend)
+        // API Base
+const API_BASE = 'https://qingmiao-v2.loca.lt';
+
+// Mock API Data
         const MOCK_API = {
             version: "0.1.0",
             clinic: {
