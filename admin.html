@@ -214,7 +214,7 @@ console.log('Admin loaded'); window.onload = function() { console.log('Window lo
 
 const API_BASE = 'https://booking-system-backend-2t8v.onrender.com/api';
 
-async function loadBookings() {
+async function loadBookings() { console.log('loadBookings called'); alert('Loading bookings...');
     const t = document.getElementById('bookingsTable');
     if(!t) return;
     t.innerHTML = '<tr><td colspan="9" style="text-align:center">載入中...</td></tr>';
