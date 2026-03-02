@@ -97,7 +97,7 @@ body{background:var(--background);color:var(--text);min-height:100vh}
 <h1>青苗綜合醫療診所</h1>
 <p class="subtitle">管理後台登入</p>
 <input type="password" id="password" placeholder="請輸入密碼" onkeypress="if(event.key==='Enter')login()">
-<button onclick="simpleLogin()">登入</button>
+<button onclick="login()">登入</button>
 <p class="login-error" id="loginError">密碼錯誤，請重試</p>
 </div>
 </div>
@@ -193,133 +193,42 @@ body{background:var(--background);color:var(--text);min-height:100vh}
 <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('cancelModal')">保留</button><button class="btn btn-danger" onclick="confirmCancel()">確認取消</button></div>
 </div>
 </div>
-
 <script>
-const API_BASE = 'https://booking-system-backend-2t8v.onrender.com/api';
-const ADMIN_PASSWORD = 'admin123';
-
-console.log('Admin loaded'); window.onload = function() { console.log('Window loaded'); loadDashboard(); loadBookings(); loadSchedule(); }; function simpleLogin() {
-    var pwd = document.getElementById('password').value;
-    if(pwd === ADMIN_PASSWORD) {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('adminContainer').classList.add('active'); loadDashboard(); loadBookings(); loadSchedule();
-        loadDashboard();
-        loadBookings();
-        loadSchedule();
-    } else {
-        document.getElementById('loginError').style.display = 'block';
-    }
-}
+const API_BASE='http://localhost:3000/api';
+const VERSION='v0.2.0';
+const ADMIN_PASSWORD='admin123';
+let mockBookings=[
+{id:'BK001',date:'2026-03-02',time:'09:00',patientName:'陳大文',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
+{id:'BK002',date:'2026-03-02',time:'10:00',patientName:'李小明',phone:'98765432',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:'腰背痛'},
+{id:'BK003',date:'2026-03-02',time:'11:00',patientName:'張小紅',phone:'91234567',service:'中醫正骨師',clinic:'青苗中藥房',status:'pending',notes:''},
+{id:'BK004',date:'2026-03-03',time:'09:00',patientName:'林小明',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
+{id:'BK005',date:'2026-03-03',time:'14:00',patientName:'黃小華',phone:'98765432',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'pending',notes:''},
+{id:'BK006',date:'2026-03-04',time:'10:00',patientName:'王小美',phone:'91234567',service:'中醫師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''},
+{id:'BK007',date:'2026-03-04',time:'15:00',patientName:'劉大偉',phone:'98765432',service:'中醫正骨師',clinic:'青苗中藥房',status:'cancelled',notes:'客戶取消'},
+{id:'BK008',date:'2026-03-05',time:'11:00',patientName:'陳小玲',phone:'91234567',service:'物理治療師',clinic:'青苗綜合醫療診所',status:'confirmed',notes:''}];
+let allBookings=[...mockBookings];
+let cancelBookingId=null;
+const timeSlots={'中醫師':['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'],'物理治療師':['09:00','10:30','14:00','15:30','17:00'],'中醫正骨師':['09:00','11:00','14:00','16:00']};
+function login(){const pwd=document.getElementById('password').value;if(pwd===ADMIN_PASSWORD){document.getElementById('loginPage').style.display='none';document.getElementById('adminContainer').classList.add('active');loadDashboard();loadBookings();loadSchedule();}else{document.getElementById('loginError').style.display='block';}}
+function logout(){document.getElementById('adminContainer').classList.remove('active');document.getElementById('loginPage').style.display='flex';document.getElementById('password').value='';document.getElementById('loginError').style.display='none';}
+function showSection(id,btn){document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(btn){document.querySelectorAll('.nav-menu button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}}
+function getWeekStart(){const n=new Date(),d=n.getDay(),diff=n.getDate()-d+(d===0?-6:1);return new Date(n.setDate(diff)).toISOString().split('T')[0];}
+function getWeekEnd(){const n=new Date(),d=n.getDay(),diff=n.getDate()-d+(d===0?0:7);return new Date(n.setDate(diff)).toISOString().split('T')[0];}
+function formatDate(s){return new Date(s).toLocaleDateString('zh-HK',{month:'short',day:'numeric'});}
+function getStatusText(s){return{'confirmed':'已確認','pending':'待確認','cancelled':'已取消'}[s]||s;}
+function loadDashboard(){const today=new Date().toISOString().split('T')[0],ws=getWeekStart(),we=getWeekEnd(),ms=today.substring(0,7)+'-01';document.getElementById('todayBookings').textContent=allBookings.filter(b=>b.date===today&&b.status!=='cancelled').length;document.getElementById('weekBookings').textContent=allBookings.filter(b=>b.date>=ws&&b.date<=we&&b.status!=='cancelled').length;document.getElementById('pendingBookings').textContent=allBookings.filter(b=>b.status==='pending').length;document.getElementById('monthBookings').textContent=allBookings.filter(b=>b.date>=ms&&b.status!=='cancelled').length;const rb=allBookings.filter(b=>b.status!=='cancelled').sort((a,b)=>new Date(b.date+' '+b.time)-new Date(a.date+' '+a.time)).slice(0,5);document.getElementById('recentBookings').innerHTML=rb.length?rb.map(b=>'<tr><td>'+formatDate(b.date)+'</td><td>'+b.time+'</td><td>'+b.patientName+'</td><td>'+b.service+'</td><td><span class="status-badge status-'+b.status+'">'+getStatusText(b.status)+'</span></td></tr>').join(''):'<tr><td colspan="5" class="empty-state">暫無預約</td></tr>';}
+function loadBookings(){renderBookingsTable(allBookings);}
+function renderBookingsTable(bs){const tbody=document.getElementById('bookingsTable');if(!bs.length){tbody.innerHTML='<tr><td colspan="9" class="empty-state">暫無預約資料</td></tr>';return;}const sorted=[...bs].sort((a,b)=>new Date(b.date+' '+b.time)-new Date(a.date+' '+a.time));tbody.innerHTML=sorted.map(b=>'<tr><td>'+b.id+'</td><td>'+formatDate(b.date)+'</td><td>'+b.time+'</td><td>'+b.patientName+'</td><td>'+b.phone+'</td><td>'+b.service+'</td><td>'+b.clinic+'</td><td><span class="status-badge status-'+b.status+'">'+getStatusText(b.status)+'</span></td><td class="action-btns"><button class="btn-edit" onclick="openEdit(''+b.id+'')">修改</button>'+(b.status!=='cancelled'?'<button class="btn-cancel-action" onclick="openCancel(''+b.id+'')">取消</button>':'')+'</td></tr>').join('');}
+function filterBookings(){const s=document.getElementById('searchInput').value.toLowerCase(),st=document.getElementById('statusFilter').value,sv=document.getElementById('serviceFilter').value,d=document.getElementById('dateFilter').value;renderBookingsTable(allBookings.filter(b=>(!s||b.patientName.toLowerCase().includes(s)||b.phone.includes(s))&&(!st||b.status===st)&&(!sv||b.service===sv)&&(!d||b.date===d)));}
+function updateTimeSlots(){const svc=document.querySelector('select[name="service"]').value,dt=document.querySelector('input[name="date"]').value,sel=document.getElementById('timeSlotSelect');sel.innerHTML='<option value="">請選擇時間</option>';if(!svc||!dt)return;const slots=timeSlots[svc]||[],booked=allBookings.filter(b=>b.date===dt&&b.service===svc&&b.status!=='cancelled').map(b=>b.time);slots.forEach(t=>{const opt=document.createElement('option');opt.value=t;opt.textContent=booked.includes(t)?t+' (已預約)':t;if(booked.includes(t))opt.disabled=true;sel.appendChild(opt);});}
+function submitBooking(e){e.preventDefault();const f=e.target,nb={id:'BK'+String(allBookings.length+1).padStart(3,'0'),date:f.date.value,time:f.time.value,patientName:f.patientName.value,phone:f.phone.value,service:f.service.value,clinic:f.clinic.value,status:'pending',notes:f.notes.value};allBookings.push(nb);resetForm();alert('預約新增成功！');loadDashboard();loadBookings();loadSchedule();}
+function resetForm(){document.getElementById('addBookingForm').reset();document.getElementById('timeSlotSelect').innerHTML='<option value="">請先選擇日期和服務</option>';}
+function openEdit(id){const b=allBookings.find(x=>x.id===id);if(!b)return;document.getElementById('editId').value=id;document.getElementById('editPatientName').value=b.patientName;document.getElementById('editPhone').value=b.phone;document.getElementById('editDate').value=b.date;document.getElementById('editStatus').value=b.status;document.getElementById('editNotes').value=b.notes||'';const et=document.getElementById('editTime');et.innerHTML='';(timeSlots[b.service]||[]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;o.selected=t===b.time;et.appendChild(o);});document.getElementById('editModal').classList.add('active');}
+function saveEdit(){const id=document.getElementById('editId').value,b=allBookings.find(x=>x.id===id);if(b){b.patientName=document.getElementById('editPatientName').value;b.phone=document.getElementById('editPhone').value;b.date=document.getElementById('editDate').value;b.time=document.getElementById('editTime').value;b.status=document.getElementById('editStatus').value;b.notes=document.getElementById('editNotes').value;}closeModal('editModal');loadDashboard();loadBookings();loadSchedule();alert('預約已更新！');}
+function openCancel(id){cancelBookingId=id;const b=allBookings.find(x=>x.id===id);document.getElementById('cancelBookingInfo').textContent=b?b.patientName+' - '+formatDate(b.date)+' '+b.time:'';document.getElementById('cancelModal').classList.add('active');}
+function confirmCancel(){if(cancelBookingId){const b=allBookings.find(x=>x.id===cancelBookingId);if(b)b.status='cancelled';}closeModal('cancelModal');loadDashboard();loadBookings();loadSchedule();}
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+function loadSchedule(){const df=document.getElementById('doctorFilter').value,sd=document.getElementById('scheduleDate').value,grid=document.getElementById('scheduleGrid');const start=sd||new Date().toISOString().split('T')[0],days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}grid.innerHTML=days.map(d=>{const dayBookings=allBookings.filter(b=>b.date===d&&b.status!=='cancelled'&&(!df||b.service===df)).sort((a,b)=>a.time.localeCompare(b.time));const dayName=new Date(d).toLocaleDateString('zh-HK',{weekday:'short'});return'<div class="schedule-day"><h4>'+dayName+'</h4>'+(dayBookings.length?dayBookings.map(b=>'<div class="schedule-slot"><div class="time">'+b.time+'</div><div class="patient">'+b.patientName+'</div><div class="service">'+b.service+'</div></div>').join(''):'<p style="color:var(--text-light);font-size:12px;text-align:center">無預約</p>')+'</div>';}).join('');}
 </script>
-
-const API_BASE = 'https://booking-system-backend-2t8v.onrender.com/api';
-
-async function loadBookings() { console.log('loadBookings called'); alert('Loading bookings...');
-    const t = document.getElementById('bookingsTable');
-    if(!t) return;
-    t.innerHTML = '<tr><td colspan="9" style="text-align:center">載入中...</td></tr>';
-    const token = localStorage.getItem('adminToken') || 'admin123';
-    try {
-        const res = await fetch(API_BASE + '/admin/appointments?token=' + token);
-        const data = await res.json();
-        if(data.appointments && Array.isArray(data.appointments)) {
-            const r = data.appointments.map(b => 
-                '<tr><td>' + b.id + '</td><td>' + b.date + '</td><td>' + b.time + '</td><td>' + b.name + '</td><td>' + b.phone + '</td><td>' + b.doctorName + '</td><td>青苗綜合醫療診所</td><td><span class="status ' + b.status + '">' + b.status + '</span></td><td><button class="btn-sm" onclick="editBooking(\'' + b.id + '\')">編輯</button> <button class="btn-sm btn-danger" onclick="cancelBooking(\'' + b.id + '\')">取消</button></td></tr>'
-            ).join('');
-            t.innerHTML = r || '<tr><td colspan="9" style="text-align:center">暫無預約</td></tr>';
-        } else if(Array.isArray(data)) {
-            const r = data.map(b => 
-                '<tr><td>' + b.id + '</td><td>' + b.date + '</td><td>' + b.time + '</td><td>' + (b.patientName || b.name) + '</td><td>' + b.phone + '</td><td>' + (b.doctorName || '') + '</td><td>青苗綜合醫療診所</td><td><span class="status ' + b.status + '">' + b.status + '</span></td><td><button class="btn-sm" onclick="editBooking(\'' + b.id + '\')">編輯</button> <button class="btn-sm btn-danger" onclick="cancelBooking(\'' + b.id + '\')">取消</button></td></tr>'
-            ).join('');
-            t.innerHTML = r || '<tr><td colspan="9" style="text-align:center">暫無預約</td></tr>';
-        } else {
-            t.innerHTML = '<tr><td colspan="9" style="text-align:center">暫無預約</td></tr>';
-        }
-    } catch(e) {
-        console.log(e);
-        t.innerHTML = '<tr><td colspan="9" style="text-align:center">載入失敗: ' + e.message + '</td></tr>';
-    }
-}
-
-async function cancelBooking(id) {
-    if(!confirm('確定取消預約？')) return;
-    const token = localStorage.getItem('adminToken') || 'admin123';
-    try {
-        const res = await fetch(API_BASE + '/admin/appointments/' + id + '?token=' + token, { method: 'DELETE' });
-        const result = await res.json();
-        if(result.success || result.message) {
-            alert('已取消');
-            loadBookings();
-        } else {
-            alert('失敗');
-        }
-    } catch(e) {
-        alert('錯誤: ' + e.message);
-    }
-}
-
-function editBooking(id) {
-    alert('編輯功能: ' + id);
-}
-
-function loadDashboard() {
-    document.getElementById('todayCount').textContent = '-';
-    document.getElementById('weekCount').textContent = '-';
-    document.getElementById('pendingCount').textContent = '-';
-    document.getElementById('monthCount').textContent = '-';
-}
-
-function loadSchedule() {
-    const g = document.getElementById('scheduleGrid');
-    if(g) g.innerHTML = '<p style="text-align:center;color:#666">載入中...</p>';
-}
-
-function resetForm() {
-    document.getElementById('addBookingForm').reset();
-}
-
-function showSection(id, btn) {
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if(btn) {
-        document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-}
-
-async function submitBooking(e) {
-    e.preventDefault();
-    const f = document.getElementById('addBookingForm');
-    const d = new FormData(f);
-    const token = localStorage.getItem('adminToken') || 'admin123';
-    const serviceMap = {'中醫師':1,'物理治療師':5,'中醫正骨師':6};
-    const data = {
-        name: d.get('patientName'),
-        phone: d.get('phone'),
-        doctorId: serviceMap[d.get('service')] || 1,
-        date: d.get('date'),
-        time: d.get('time'),
-        notes: d.get('notes')
-    };
-    try {
-        const res = await fetch(API_BASE + '/appointments?token=' + token, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if(result.id || result.success || result.appointment) {
-            alert('預約成功！');
-            resetForm();
-            loadBookings();
-            showSection('bookings');
-        } else {
-            alert('失敗: ' + JSON.stringify(result));
-        }
-    } catch(e) {
-        alert('錯誤: ' + e.message);
-    }
-}
-
 </body>
 </html>
