@@ -1321,58 +1321,5 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             goToStep(1);
         }
     </script>
-
-// Mock API Data
-        const MOCK_API = {
-            version: "0.1.0",
-            clinic: {
-                name: "青苗綜合醫療診所",
-                address: "香港中環皇后大道中99號中環中心12樓",
-                phone: "2525-1234"
-            },
-            doctors: [
-                {id: 1, name: "陳醫師", type: "中醫-問診", duration: 15},
-                {id: 2, name: "陳醫師", type: "中醫-治療", duration: 45},
-                {id: 3, name: "李醫師", type: "中醫-問診", duration: 15},
-                {id: 4, name: "李醫師", type: "中醫-治療", duration: 45},
-                {id: 5, name: "張物理治療師", type: "物理治療", duration: 60},
-                {id: 6, name: "王正骨師", type: "中醫正骨", duration: 60}
-            ],
-            settings: {
-                bookingDaysAhead: 30,
-                minAdvanceHours: 2,
-                clinicHours: {
-                    mon: "09:00-18:00",
-                    tue: "09:00-18:00",
-                    wed: "09:00-18:00",
-                    thu: "09:00-18:00",
-                    fri: "09:00-18:00",
-                    sat: "09:00-14:00",
-                    sun: "休息"
-                }
-            }
-        };
-
-
-<!--
-<div id="debug-panel" style="position:fixed;bottom:0;left:0;right:0;background:#333;color:#fff;padding:10px;font-size:12px;z-index:9999;max-height:200px;overflow:auto;">
-<div><strong>Debug Info:</strong> <button onclick="document.getElementById('debug-content').style.display=document.getElementById('debug-content').style.display?'none':'block'">Show/Hide</button></div>
-<div id="debug-content" style="display:none;">
-<div>API_BASE: <span id="debug-api"></span></div>
-<div>bookingData: <pre id="debug-data" style="margin:5px 0;white-space:pre-wrap;"></pre></div>
-<div>Submit Button: <span id="debug-btn"></span></div>
-</div>
-</div>
-<script>
-let bookingData = { clinic: null, service: null, date: null, time: null, name: null, phone: null, duration: null };
-
-
-setInterval(() => {
-  document.getElementById('debug-api').textContent = typeof API_BASE !== 'undefined' ? API_BASE : 'NOT DEFINED';
-  document.getElementById('debug-data').textContent = typeof bookingData !== 'undefined' ? JSON.stringify(bookingData,null,2) : 'NOT DEFINED';
-  const btn = document.getElementById('submit-booking');
-  document.getElementById('debug-btn').textContent = btn ? ('disabled='+btn.disabled+', text='+btn.textContent) : 'NOT FOUND';
-}, 1000);
--->
-</script></body>
+</body>
 </html>
