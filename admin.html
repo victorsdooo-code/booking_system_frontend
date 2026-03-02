@@ -100,9 +100,14 @@
                     '<tr><td>' + b.id + '</td><td>' + b.date + '</td><td>' + b.time + '</td><td>' + (b.name || b.patientName) + '</td><td>' + b.phone + '</td><td>' + (b.doctorName || '') + '</td><td>' + (b.status || 'confirmed') + '</td></tr>'
                 ).join('');
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">載入失敗: ' + e.message + '</td></tr>';
+                const errLog = document.getElementById('errorLogs'); errLog.innerHTML += '<div>[' + new Date().toISOString() + '] Load failed: ' + e.message + '</div>'; tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">載入失敗: ' + e.message + '</td></tr>';
             }
         }
     </script>
+
+        <div style="margin-top: 20px; padding: 10px; background: #ffeeee; border-radius: 8px;">
+            <h3>Error Logs</h3>
+            <div id="errorLogs" style="font-size: 12px; max-height: 200px; overflow: auto;"></div>
+        </div>
 </body>
 </html>
