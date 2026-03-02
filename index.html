@@ -876,7 +876,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step5-prev">上一步</button>
-                <button class="btn btn-primary" id="submit-booking" disabled>確認預約</button>
+                <button class="btn btn-primary" id="submit-booking">確認預約</button>
             </div>
         </div>
 
@@ -925,6 +925,7 @@
     </footer>
 
     <script>
+        const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
         // View Mode Control - Toggle between Desktop and Mobile
         function setViewMode(mode) {
             const body = document.body;
@@ -1154,6 +1155,7 @@
             function validateForm() {
                 const nameValid = nameInput.value.trim().length > 0;
                 const phoneValid = phoneInput.value.trim().length >= 8;
+                document.getElementById('submit-booking').disabled = !(nameValid && phoneValid);
                 // Enabled for testing
             }
             
@@ -1168,7 +1170,6 @@
             });
             
             document.getElementById('submit-booking').addEventListener('click', function() {
-    this.disabled = false;
     submitBooking();
 });
             document.getElementById('new-booking').addEventListener('click', resetBooking);
@@ -1212,26 +1213,22 @@
         }
 
         function submitBooking() {
-            alert('Submitting booking...'); console.log('Submit clicked!');
-            console.log('bookingData:', typeof bookingData, bookingData);
+            console.log('Submit clicked!');
+            console.log('bookingData:', bookingData);
             
-            // Get data directly from DOM to ensure we have it
-            const name = document.getElementById('name')?.value || '';
-            const phone = document.getElementById('phone')?.value || '';
+            // Use the bookingData object which is already properly populated
+            const name = bookingData.name || '';
+            const phone = bookingData.phone || '';
+            const service = bookingData.service || '';
+            const date = bookingData.date ? bookingData.date.toISOString().split('T')[0] : '';
+            const time = bookingData.time || '10:00';
             
-            // Find selected service
-            const selectedService = document.querySelector('.option-card.selected');
-            const service = selectedService?.dataset?.value || '';
-            
-            // Find selected date
-            const selectedDateEl = document.querySelector('.calendar-day.selected');
-            const date = selectedDateEl?.dataset?.date || new Date().toISOString().split('T')[0];
-            
-            // Find selected time  
-            const selectedTimeEl = document.querySelector('.time-slot.selected');
-            const time = selectedTimeEl?.dataset?.time || '10:00';
-            
-            const serviceMap = {'中醫-問診': 1, '中醫-治療': 2, '物理治療': 5, '中醫正骨': 6};
+            const serviceMap = {
+                '中醫師 - 問診': 1,
+                '中醫師 - 治療': 2,
+                '物理治療師': 5,
+                '中醫正骨師': 6
+            };
             
             const apiData = {
                 name: name,
@@ -1243,35 +1240,50 @@
             
             console.log('Submitting:', apiData);
             
+            // Show loading state
+            const submitBtn = document.getElementById('submit-booking');
+            submitBtn.textContent = '提交中...';
+            submitBtn.disabled = true;
+            
             // Call API
             fetch(API_BASE + '/api/appointments', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(apiData)
-            }).then(r => r.json()).then(d => {
-                console.log('Booking saved:', d);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Booking saved:', data);
                 alert('預約成功！');
-            }).catch(e => {
-                console.log('API error:', e);
-                alert('錯誤: ' + e.message);
+                
+                // Update confirmation display
+                document.getElementById('confirm-clinic').textContent = bookingData.clinic || '青苗綜合醫療診所';
+                document.getElementById('confirm-service').textContent = service;
+                
+                const dateStr = bookingData.date ? bookingData.date.toLocaleDateString('zh-HK', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    weekday: 'long'
+                }) : date;
+                document.getElementById('confirm-date').textContent = dateStr;
+                document.getElementById('confirm-time').textContent = time;
+                document.getElementById('confirm-name').textContent = name;
+                document.getElementById('confirm-phone').textContent = phone;
+                
+                goToStep(6);
+            })
+            .catch(error => {
+                console.log('API error:', error);
+                alert('預約失敗，請稍後再試: ' + error.message);
+                submitBtn.textContent = '確認預約';
+                submitBtn.disabled = false;
             });
-            
-            // Update confirmation (fallback)
-            document.getElementById('confirm-clinic').textContent = '青苗綜合醫療診所';
-            document.getElementById('confirm-service').textContent = bookingData.service;
-            
-            const dateStr = bookingData.date.toLocaleDateString('zh-HK', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                weekday: 'long'
-            });
-            document.getElementById('confirm-date').textContent = dateStr;
-            document.getElementById('confirm-time').textContent = bookingData.time;
-            document.getElementById('confirm-name').textContent = bookingData.name;
-            document.getElementById('confirm-phone').textContent = bookingData.phone;
-            
-            goToStep(6);
         }
 
         function resetBooking() {
@@ -1304,9 +1316,6 @@
             goToStep(1);
         }
     </script>
-
-        // API Base
-const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
 
 // Mock API Data
         const MOCK_API = {
