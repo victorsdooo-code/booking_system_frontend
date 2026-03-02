@@ -925,7 +925,6 @@
     </footer>
 
     <script>
-let bookingData = { clinic: null, service: null, date: null, time: null, name: null, phone: null, duration: null };
         const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
         // View Mode Control - Toggle between Desktop and Mobile
         function setViewMode(mode) {
@@ -978,7 +977,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         }
 
         // Booking Data
-        const bookingData = {
+        # const bookingData = {
             clinic: null,
             service: null,
             duration: null,
@@ -1371,7 +1370,6 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
 </div>
 </div>
 <script>
-let bookingData = { clinic: null, service: null, date: null, time: null, name: null, phone: null, duration: null };
 setInterval(() => {
   document.getElementById('debug-api').textContent = typeof API_BASE !== 'undefined' ? API_BASE : 'NOT DEFINED';
   document.getElementById('debug-data').textContent = typeof bookingData !== 'undefined' ? JSON.stringify(bookingData,null,2) : 'NOT DEFINED';
