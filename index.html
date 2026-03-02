@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青苗綜合醫療診所 - 預約系統</title>
+    <style>
+        :root {
+            --primary: #2D5A3D;
+            --primary-light: #4A7C59;
+            --primary-dark: #1E3D2A;
+            --accent: #7CB68E;
+            --accent-light: #A8D5B5;
+            --background: #F8FAF9;
+            --card-bg: #FFFFFF;
+            --text: #1A1A1A;
+            --text-light: #666666;
+            --border: #E0E5E2;
+            --success: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', 'PingFang HK', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(45, 90, 61, 0.15);
+            position: relative;
+        }
+
+        header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: var(--accent-light);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        /* View Toggle Button */
+        .view-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .view-toggle button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .view-toggle button.active {
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .view-toggle button:hover:not(.active) {
+            color: white;
+        }
+
+        /* Progress Steps - Desktop */
+        .progress-container {
+            background: var(--card-bg);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .step.completed {
+            color: var(--success);
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-line {
+            width: 50px;
+            height: 2px;
+            background: var(--border);
+            margin: 0 12px;
+            transition: background 0.3s;
+        }
+
+        .step.completed + .step-line,
+        .step.completed ~ .step-line {
+            background: var(--success);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Desktop: Wider layout */
+        main.desktop-mode {
+            max-width: 900px;
+        }
+
+        /* Mobile: Compact layout */
+        main.mobile-mode {
+            padding: 20px 12px;
+            max-width: 100%;
+        }
+
+        /* Booking Step */
+        .booking-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .booking-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Desktop hints - full guidance */
+        .desktop-hint {
+            background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: var(--primary-dark);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .desktop-hint h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .desktop-hint ul {
+            padding-left: 20px;
+        }
+
+        .desktop-hint li {
+            margin-bottom: 6px;
+        }
+
+        /* Mobile: Simplified hints */
+        .mobile-hint {
+            display: none;
+        }
+
+        .mobile-mode .mobile-hint {
+            display: block;
+            background: var(--accent-light);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--primary-dark);
+        }
+
+        .mobile-mode .desktop-hint {
+            display: none;
+        }
+
+        /* Cards */
+        .option-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.1);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(45, 90, 61, 0.05) 0%, rgba(124, 182, 142, 0.05) 100%);
+        }
+
+        .option-card h3 {
+            font-size: 18px;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .option-card p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .option-card .duration {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--primary-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* Date Selection */
+        .date-picker {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .date-header h3 {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .date-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .date-nav button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .date-nav button:hover {
+            background: var(--primary-light);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+
+        .calendar-day {
+            padding: 10px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .calendar-day:hover:not(.disabled):not(.selected) {
+            background: var(--accent-light);
+        }
+
+        .calendar-day.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calendar-day.disabled {
+            color: var(--border);
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--primary);
+        }
+
+        .day-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        /* Time Selection */
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .time-slot {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--accent);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .time-slot.disabled {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            background: var(--card-bg);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Mobile: Full-width buttons, stacked */
+        .mobile-mode .btn-group {
+            flex-direction: column;
+        }
+
+        .mobile-mode .btn {
+            width: 100%;
+        }
+
+        /* Confirmation */
+        .confirmation-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .confirmation-header .icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: white;
+        }
+
+        .confirmation-header h2 {
+            color: var(--primary);
+            font-size: 22px;
+        }
+
+        .booking-details {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-dark);
+            color: var(--accent-light);
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+        }
+
+        /* ========== Mobile Responsive Styles ========== */
+        @media (max-width: 768px) {
+            body.mobile-view main {
+                padding: 16px 12px;
+            }
+
+            body.mobile-view .time-slots {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            body.mobile-view .time-slot {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+
+            body.mobile-view .option-card {
+                padding: 16px;
+                margin-bottom: 10px;
+            }
+
+            body.mobile-view .option-card h3 {
+                font-size: 16px;
+            }
+
+            body.mobile-view .step-title {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            body.mobile-view .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            body.mobile-view .btn {
+                width: 100%;
+                padding: 14px;
+            }
+
+            body.mobile-view header h1 {
+                font-size: 22px;
+            }
+
+            body.mobile-view .view-toggle {
+                top: 12px;
+                right: 12px;
+            }
+
+            body.mobile-view .view-toggle button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            /* Mobile progress bar - simplified */
+            .mobile-progress {
+                display: flex;
+                background: var(--card-bg);
+                padding: 12px 16px;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }
+
+            .mobile-progress-step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 11px;
+                color: var(--text-light);
+            }
+
+            .mobile-progress-step.active {
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .mobile-progress-step.completed {
+                color: var(--success);
+            }
+
+            .mobile-progress-step .step-num {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: var(--border);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+            .mobile-progress-step.active .step-num {
+                background: var(--primary);
+                color: white;
+            }
+
+            .mobile-progress-step.completed .step-num {
+                background: var(--success);
+                color: white;
+            }
+        }
+
+        /* Desktop: Hide mobile progress */
+        @media (min-width: 769px) {
+            .mobile-progress {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>青苗綜合醫療診所</h1>
+        <p>預約系統 v0.1.0</p>
+        <div class="view-toggle">
+            <button id="btn-desktop" class="active" onclick="setViewMode('desktop')">電腦版</button>
+            <button id="btn-mobile" onclick="setViewMode('mobile')">手機版</button>
+        </div>
+    </header>
+
+    <!-- Desktop Progress -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span>選擇診所</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span>服務類型</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span>日期</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="4">
+                <span class="step-number">4</span>
+                <span>時間</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="5">
+                <span class="step-number">5</span>
+                <span>資料</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Progress (hidden by default) -->
+    <div class="mobile-progress" style="display: none;">
+        <div class="mobile-progress-step active" data-step="1">
+            <span class="step-num">1</span>
+            <span>診所</span>
+        </div>
+        <div class="mobile-progress-step" data-step="2">
+            <span class="step-num">2</span>
+            <span>服務</span>
+        </div>
+        <div class="mobile-progress-step" data-step="3">
+            <span class="step-num">3</span>
+            <span>日期</span>
+        </div>
+        <div class="mobile-progress-step" data-step="4">
+            <span class="step-num">4</span>
+            <span>時間</span>
+        </div>
+        <div class="mobile-progress-step" data-step="5">
+            <span class="step-num">5</span>
+            <span>資料</span>
+        </div>
+    </div>
+
+    <main class="desktop-mode">
+        <!-- Step 1: 選擇診所 -->
+        <div class="booking-step active" data-step="1">
+            <div class="desktop-hint">
+                <h4>📋 預約流程說明</h4>
+                <ul>
+                    <li>選擇您要到訪的診所</li>
+                    <li>選擇需要的服務類型</li>
+                    <li>選擇預約日期和時間</li>
+                    <li>填寫個人資料完成預約</li>
+                </ul>
+            </div>
+            <div class="mobile-hint">👆 請選擇您要到訪的診所</div>
+            <h2 class="step-title">請選擇診所</h2>
+            <div class="option-card" data-value="青苗綜合醫療診所">
+                <h3>青苗綜合醫療診所</h3>
+                <p>全面的中西醫療服務</p>
+            </div>
+            <div class="option-card" data-value="青苗中藥房">
+                <h3>青苗中藥房</h3>
+                <p>專業中藥調配與諮詢</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="step1-next" disabled>下一步</button>
+            </div>
+        </div>
+
+        <!-- Step 2: 選擇服務類型 -->
+        <div class="booking-step" data-step="2">
+            <div class="desktop-hint">
+                <h4>💡 服務類型提示</h4>
+                <ul>
+                    <li><strong>問診：</strong>適合一般健康諮詢</li>
+                    <li><strong>治療：</strong>需要較長時間的治療</li>
+                    <li><strong>物理治療：</strong>運動傷害康復</li>
+                    <li><strong>正骨：</strong>骨骼關節問題</li>
+                </ul>
+            </div>
+            <div class="mobile-hint">👆 選擇適合您的服務類型</div>
+            <h2 class="step-title">請選擇服務類型</h2>
+            <div class="option-card" data-value="中醫師 - 問診" data-duration="15">
+                <h3>中醫師 - 問診</h3>
+                <p>傳統中醫問診服務</p>
+                <span class="duration">15 分鐘</span>
+            </div>
+            <div class="option-card" data-value="中醫師 - 治療" data-duration="45">
+                <h3>中醫師 - 治療</h3>
+                <p>中醫治療服務</p>
+                <span class="duration">45 分鐘</span>
+            </div>
+            <div class="option-card" data-value="物理治療師" data-duration="60">
+                <h3>物理治療師</h3>
+                <p>專業物理治療服務</p>
+                <span class="duration">60 分鐘</span>
+            </div>
+            <div class="option-card" data-value="中醫正骨師" data-duration="60">
+                <h3>中醫正骨師</h3>
+                <p>整脊正骨治療服務</p>
+                <span class="duration">60 分鐘</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="step2-prev">上一步</button>
+                <button class="btn btn-primary" id="step2-next" disabled>下一步</button>
+            </div>
+        </div>
+
+        <!-- Step 3: 選擇日期 -->
+        <div class="booking-step" data-step="3">
+            <div class="desktop-hint">
+                <h4>📅 選擇日期提示</h4>
+                <ul>
+                    <li>可以預約未來30天內的日期</li>
+                    <li>紅色標記的是今天</li>
+                    <li>灰色日期為已過去的日子</li>
+                    <li>點擊日期即可選擇</li>
+                </ul>
+            </div>
+            <div class="mobile-hint">👆 點擊日曆選擇預約日期</div>
+            <h2 class="step-title">請選擇日期</h2>
+            <div class="date-picker">
+                <div class="date-header">
+                    <h3 id="current-month">2026年3月</h3>
+                    <div class="date-nav">
+                        <button id="prev-month">‹</button>
+                        <button id="next-month">›</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendar">
+                    <!-- Calendar will be generated by JS -->
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="step3-prev">上一步</button>
+                <button class="btn btn-primary" id="step3-next" disabled>下一步</button>
+            </div>
+        </div>
+
+        <!-- Step 4: 選擇時間 -->
+        <div class="booking-step" data-step="4">
+            <div class="desktop-hint">
+                <h4>🕐 選擇時間提示</h4>
+                <ul>
+                    <li>早上：09:00 - 12:00</li>
+                    <li>下午：14:00 - 18:00</li>
+                    <li>灰色時段表示已被預約</li>
+                    <li>選擇有空位的時段</li>
+                </ul>
+            </div>
+            <div class="mobile-hint">👆 選擇您方便的時間</div>
+            <h2 class="step-title">請選擇時間</h2>
+            <div class="time-slots" id="time-slots">
+                <!-- Time slots will be generated by JS -->
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="step4-prev">上一步</button>
+                <button class="btn btn-primary" id="step4-next" disabled>下一步</button>
+            </div>
+        </div>
+
+        <!-- Step 5: 輸入個人資料 -->
+        <div class="booking-step" data-step="5">
+            <div class="desktop-hint">
+                <h4>📝 資料填寫說明</h4>
+                <ul>
+                    <li>請填寫真實姓名</li>
+                    <li>電話號碼用於確認預約</li>
+                    <li>資料僅用於預約用途</li>
+                    <li>確認後會顯示預約詳情</li>
+                </ul>
+            </div>
+            <div class="mobile-hint">👆 填寫個人資料完成預約</div>
+            <h2 class="step-title">請輸入個人資料</h2>
+            <div class="form-group">
+                <label for="name">姓名</label>
+                <input type="text" id="name" placeholder="請輸入您的姓名">
+            </div>
+            <div class="form-group">
+                <label for="phone">電話</label>
+                <input type="tel" id="phone" placeholder="請輸入您的電話號碼">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="step5-prev">上一步</button>
+                <button class="btn btn-primary" id="submit-booking" disabled>確認預約</button>
+            </div>
+        </div>
+
+        <!-- Confirmation -->
+        <div class="booking-step" data-step="6">
+            <div class="confirmation-card">
+                <div class="confirmation-header">
+                    <div class="icon">✓</div>
+                    <h2>預約成功！</h2>
+                </div>
+                <div class="booking-details">
+                    <div class="detail-row">
+                        <span class="detail-label">診所</span>
+                        <span class="detail-value" id="confirm-clinic">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">服務類型</span>
+                        <span class="detail-value" id="confirm-service">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">日期</span>
+                        <span class="detail-value" id="confirm-date">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">時間</span>
+                        <span class="detail-value" id="confirm-time">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">姓名</span>
+                        <span class="detail-value" id="confirm-name">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">電話</span>
+                        <span class="detail-value" id="confirm-phone">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="new-booking">預約另一個時段</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>青苗綜合醫療診所 © 2026 | 版本 v0.1.0</p>
+    </footer>
+
+    <script>
+        // View Mode Control - Toggle between Desktop and Mobile
+        function setViewMode(mode) {
+            const body = document.body;
+            const btnDesktop = document.getElementById('btn-desktop');
+            const btnMobile = document.getElementById('btn-mobile');
+            const main = document.querySelector('main');
+            const mobileProgress = document.querySelector('.mobile-progress');
+            const desktopProgress = document.querySelector('.progress-container');
+
+            if (mode === 'mobile') {
+                // Enable mobile view
+                body.classList.add('mobile-view');
+                btnDesktop.classList.remove('active');
+                btnMobile.classList.add('active');
+                main.classList.remove('desktop-mode');
+                main.classList.add('mobile-mode');
+                mobileProgress.style.display = 'flex';
+                desktopProgress.style.display = 'none';
+            } else {
+                // Enable desktop view
+                body.classList.remove('mobile-view');
+                btnDesktop.classList.add('active');
+                btnMobile.classList.remove('active');
+                main.classList.add('desktop-mode');
+                main.classList.remove('mobile-mode');
+                mobileProgress.style.display = 'none';
+                desktopProgress.style.display = 'block';
+            }
+            
+            // Save user preference
+            localStorage.setItem('booking-view-mode', mode);
+        }
+
+        // Auto-detect device on load
+        function autoDetectDevice() {
+            const savedMode = localStorage.getItem('booking-view-mode');
+            if (savedMode) {
+                setViewMode(savedMode);
+                return;
+            }
+
+            // Detect mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                || window.innerWidth <= 768;
+            
+            if (isMobile) {
+                setViewMode('mobile');
+            }
+        }
+
+        // Booking Data
+        const bookingData = {
+            clinic: null,
+            service: null,
+            duration: null,
+            date: null,
+            time: null,
+            name: null,
+            phone: null
+        };
+
+        // Current step
+        let currentStep = 1;
+
+        // Calendar state
+        let currentDate = new Date();
+        let selectedDate = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            autoDetectDevice();
+            initOptionCards();
+            initCalendar();
+            initTimeSlots();
+            initButtons();
+        });
+
+        // Option Cards
+        function initOptionCards() {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const step = card.closest('.booking-step').dataset.step;
+                    document.querySelectorAll(`.booking-step[data-step="${step}"] .option-card`).forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    card.classList.add('selected');
+                    
+                    // Update booking data
+                    if (step === '1') {
+                        bookingData.clinic = card.dataset.value;
+                        document.getElementById('step1-next').disabled = false;
+                    } else if (step === '2') {
+                        bookingData.service = card.dataset.value;
+                        bookingData.duration = card.dataset.duration;
+                        document.getElementById('step2-next').disabled = false;
+                    }
+                });
+            });
+        }
+
+        // Calendar
+        function initCalendar() {
+            renderCalendar();
+            
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('current-month').textContent = year + '年' + (month + 1) + '月';
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            // Day labels
+            const dayLabels = ['日', '一', '二', '三', '四', '五', '六'];
+            dayLabels.forEach(day => {
+                const label = document.createElement('div');
+                label.className = 'day-label';
+                label.textContent = day;
+                calendar.appendChild(label);
+            });
+            
+            // First day of month
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                calendar.appendChild(document.createElement('div'));
+            }
+            
+            // Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.textContent = day;
+                
+                // Past dates
+                if (date < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+                    cell.classList.add('disabled');
+                } else {
+                    cell.addEventListener('click', () => {
+                        document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected'));
+                        cell.classList.add('selected');
+                        bookingData.date = date;
+                        selectedDate = date;
+                        document.getElementById('step3-next').disabled = false;
+                    });
+                }
+                
+                // Today
+                if (date.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+                
+                calendar.appendChild(cell);
+            }
+        }
+
+        // Time Slots
+        function initTimeSlots() {
+            const timeSlots = document.getElementById('time-slots');
+            const times = [
+                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+                '17:00', '17:30'
+            ];
+            
+            times.forEach(time => {
+                const slot = document.createElement('div');
+                slot.className = 'time-slot';
+                slot.textContent = time;
+                
+                // Randomly disable some slots for demo
+                if (Math.random() < 0.3) {
+                    slot.classList.add('disabled');
+                } else {
+                    slot.addEventListener('click', () => {
+                        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                        slot.classList.add('selected');
+                        bookingData.time = time;
+                        document.getElementById('step4-next').disabled = false;
+                    });
+                }
+                
+                timeSlots.appendChild(slot);
+            });
+        }
+
+        // Buttons
+        function initButtons() {
+            // Step 1
+            document.getElementById('step1-next').addEventListener('click', () => goToStep(2));
+            
+            // Step 2
+            document.getElementById('step2-prev').addEventListener('click', () => goToStep(1));
+            document.getElementById('step2-next').addEventListener('click', () => goToStep(3));
+            
+            // Step 3
+            document.getElementById('step3-prev').addEventListener('click', () => goToStep(2));
+            document.getElementById('step3-next').addEventListener('click', () => goToStep(4));
+            
+            // Step 4
+            document.getElementById('step4-prev').addEventListener('click', () => goToStep(3));
+            document.getElementById('step4-next').addEventListener('click', () => goToStep(5));
+            
+            // Step 5
+            document.getElementById('step5-prev').addEventListener('click', () => goToStep(4));
+            
+            // Form validation
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            
+            function validateForm() {
+                const nameValid = nameInput.value.trim().length > 0;
+                const phoneValid = phoneInput.value.trim().length >= 8;
+                document.getElementById('submit-booking').disabled = !(nameValid && phoneValid);
+            }
+            
+            nameInput.addEventListener('input', () => {
+                validateForm();
+                bookingData.name = nameInput.value;
+            });
+            
+            phoneInput.addEventListener('input', () => {
+                validateForm();
+                bookingData.phone = phoneInput.value;
+            });
+            
+            document.getElementById('submit-booking').addEventListener('click', submitBooking);
+            document.getElementById('new-booking').addEventListener('click', resetBooking);
+        }
+
+        function goToStep(step) {
+            // Hide current step
+            document.querySelector('.booking-step[data-step="' + currentStep + '"]').classList.remove('active');
+            document.querySelector('.step[data-step="' + currentStep + '"]').classList.remove('active');
+            document.querySelector('.mobile-progress-step[data-step="' + currentStep + '"]')?.classList.remove('active');
+            
+            // Show new step
+            currentStep = step;
+            document.querySelector('.booking-step[data-step="' + step + '"]').classList.add('active');
+            
+            // Update desktop progress
+            document.querySelectorAll('.step').forEach((s, i) => {
+                if (i + 1 < step) {
+                    s.classList.add('completed');
+                    s.classList.remove('active');
+                } else if (i + 1 === step) {
+                    s.classList.add('active');
+                    s.classList.remove('completed');
+                } else {
+                    s.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update mobile progress
+            document.querySelectorAll('.mobile-progress-step').forEach((s, i) => {
+                if (i + 1 < step) {
+                    s.classList.add('completed');
+                    s.classList.remove('active');
+                } else if (i + 1 === step) {
+                    s.classList.add('active');
+                    s.classList.remove('completed');
+                } else {
+                    s.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function submitBooking() {
+            // Update confirmation
+            document.getElementById('confirm-clinic').textContent = bookingData.clinic;
+            document.getElementById('confirm-service').textContent = bookingData.service;
+            
+            const dateStr = bookingData.date.toLocaleDateString('zh-HK', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('confirm-date').textContent = dateStr;
+            document.getElementById('confirm-time').textContent = bookingData.time;
+            document.getElementById('confirm-name').textContent = bookingData.name;
+            document.getElementById('confirm-phone').textContent = bookingData.phone;
+            
+            goToStep(6);
+        }
+
+        function resetBooking() {
+            // Reset data
+            Object.keys(bookingData).forEach(key => {
+                bookingData[key] = null;
+            });
+            selectedDate = null;
+            
+            // Reset UI
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            
+            document.getElementById('step1-next').disabled = true;
+            document.getElementById('step2-next').disabled = true;
+            document.getElementById('step3-next').disabled = true;
+            document.getElementById('step4-next').disabled = true;
+            document.getElementById('submit-booking').disabled = true;
+            
+            // Reset to step 1
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
+            document.querySelector('.step[data-step="1"]').classList.add('active');
+            
+            document.querySelectorAll('.mobile-progress-step').forEach(s => s.classList.remove('active', 'completed'));
+            document.querySelector('.mobile-progress-step[data-step="1"]').classList.add('active');
+            
+            goToStep(1);
+        }
+    </script>
+</body>
+</html>
