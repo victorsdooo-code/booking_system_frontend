@@ -1177,7 +1177,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             
             // Submit button click handler - clean and direct
             submitBtn.addEventListener('click', (e) => { e.preventDefault(); submitBtn.disabled = false;
-                console.log('Submit button clicked!');
+                console.log('Submit clicked!'); alert('Submit clicked! API:' + API_BASE);
                 if (validateForm()) {
                     submitBooking();
                 } else {
