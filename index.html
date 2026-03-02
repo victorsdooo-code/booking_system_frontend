@@ -1257,5 +1257,37 @@
             goToStep(1);
         }
     </script>
+
+        // Mock API Data (for demo without backend)
+        const MOCK_API = {
+            version: "0.1.0",
+            clinic: {
+                name: "青苗綜合醫療診所",
+                address: "香港中環皇后大道中99號中環中心12樓",
+                phone: "2525-1234"
+            },
+            doctors: [
+                {id: 1, name: "陳醫師", type: "中醫-問診", duration: 15},
+                {id: 2, name: "陳醫師", type: "中醫-治療", duration: 45},
+                {id: 3, name: "李醫師", type: "中醫-問診", duration: 15},
+                {id: 4, name: "李醫師", type: "中醫-治療", duration: 45},
+                {id: 5, name: "張物理治療師", type: "物理治療", duration: 60},
+                {id: 6, name: "王正骨師", type: "中醫正骨", duration: 60}
+            ],
+            settings: {
+                bookingDaysAhead: 30,
+                minAdvanceHours: 2,
+                clinicHours: {
+                    mon: "09:00-18:00",
+                    tue: "09:00-18:00",
+                    wed: "09:00-18:00",
+                    thu: "09:00-18:00",
+                    fri: "09:00-18:00",
+                    sat: "09:00-14:00",
+                    sun: "休息"
+                }
+            }
+        };
+
 </body>
 </html>
