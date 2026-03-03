@@ -1129,9 +1129,9 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             const duration = { '中醫師 - 問診': 15, '中醫師 - 治療': 45, '物理治療師': 60, '中醫正骨師': 60 }[service] || 30;
             
             try {
-                const res = await fetch(API_BASE + '/api/slots?date=' + date.toISOString().split('T')[0] + '&doctorId=1');
+                const dateStr = typeof date === 'object' ? date.toISOString().split('T')[0] : date; const res = await fetch(API_BASE + '/api/appointments?date=' + dateStr);
                 const data = await res.json();
-                const booked = data.slots || [];
+                const booked = Array.isArray(data) ? data : (data.appointments || []);
                 
                 // Disable conflicting slots
                 document.querySelectorAll('.time-slot').forEach(slot => {
