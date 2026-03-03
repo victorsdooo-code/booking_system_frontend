@@ -247,7 +247,7 @@
         }
 
         /* Cards */
-        .option-card {
+        .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 12px;
@@ -579,7 +579,7 @@
                 font-size: 14px;
             }
 
-            body.mobile-view .option-card {
+            body.mobile-view .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
                 padding: 16px;
                 margin-bottom: 10px;
             }
@@ -677,7 +677,7 @@
     
         @media (max-width: 768px) {
             .container { padding: 16px !important; }
-            .option-card { min-height: 80px !important; font-size: 14px !important; }
+            .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; } min-height: 80px !important; font-size: 14px !important; }
             .calendar-day { width: 36px !important; height: 36px !important; }
             .time-slot { padding: 8px !important; font-size: 12px !important; }
             .step-container { padding: 20px !important; }
