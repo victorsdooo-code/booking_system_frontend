@@ -1093,33 +1093,71 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         }
 
         // Time Slots
+        const TIME_SLOTS = [
+            '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+            '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+            '17:00', '17:30'
+        ];
+        
         function initTimeSlots() {
             const timeSlots = document.getElementById('time-slots');
-            const times = [
-                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-                '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-                '17:00', '17:30'
-            ];
+            timeSlots.innerHTML = '';
             
-            times.forEach(time => {
+            TIME_SLOTS.forEach(time => {
                 const slot = document.createElement('div');
                 slot.className = 'time-slot';
+                slot.dataset.time = time;
                 slot.textContent = time;
-                
-                // Randomly disable some slots for demo
-                if (Math.random() < 0.3) {
-                    slot.classList.add('disabled');
-                } else {
-                    slot.addEventListener('click', () => {
+                slot.addEventListener('click', () => {
+                    if (!slot.classList.contains('disabled')) {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
                         slot.classList.add('selected');
                         bookingData.time = time;
                         document.getElementById('step4-next').disabled = false;
-                    });
-                }
-                
+                    }
+                });
                 timeSlots.appendChild(slot);
             });
+        }
+        
+        // Check for conflicts based on service duration
+        async function checkTimeConflicts() {
+            const service = bookingData.service;
+            const date = bookingData.date;
+            if (!service || !date) return;
+            
+            const duration = { '中醫師 - 問診': 15, '中醫師 - 治療': 45, '物理治療師': 60, '中醫正骨師': 60 }[service] || 30;
+            
+            try {
+                const res = await fetch(API_BASE + '/api/slots?date=' + date.toISOString().split('T')[0] + '&doctorId=1');
+                const data = await res.json();
+                const booked = data.slots || [];
+                
+                // Disable conflicting slots
+                document.querySelectorAll('.time-slot').forEach(slot => {
+                    const time = slot.dataset.time;
+                    const hour = parseInt(time.split(':')[0]);
+                    const minute = parseInt(time.split(':')[1]);
+                    const slotEnd = hour * 60 + minute + duration;
+                    
+                    // Check if any booked slot conflicts
+                    let hasConflict = false;
+                    for (const b of booked) {
+                        const bh = parseInt(b.time.split(':')[0]);
+                        const bm = parseInt(b.time.split(':')[1]);
+                        const bookedEnd = bh * 60 + bm + (b.duration || 30);
+                        if (!(slotEnd <= bh * 60 + bm || hour * 60 + minute >= bookedEnd)) {
+                            hasConflict = true;
+                            break;
+                        }
+                    }
+                    
+                    slot.classList.toggle('disabled', hasConflict);
+                    slot.classList.toggle('selected', false);
+                });
+            } catch(e) {
+                console.log('Error checking conflicts:', e);
+            }
         }
 
         // Buttons
