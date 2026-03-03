@@ -1122,7 +1122,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         }
         
         // Check for conflicts based on service duration
-        async function checkTimeConflicts_DISABLED() {
+        async function //checkTimeConflicts_DISABLED() {
             const service = bookingData.service;
             const date = bookingData.date;
             if (!service || !date) return;
