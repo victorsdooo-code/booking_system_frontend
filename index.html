@@ -1121,44 +1121,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             });
         }
         
-        // Check for conflicts based on service duration
-        async function //checkTimeConflicts_DISABLED() {
-            const service = bookingData.service;
-            const date = bookingData.date;
-            if (!service || !date) return;
-            
-            const duration = { '中醫師 - 問診': 15, '中醫師 - 治療': 45, '物理治療師': 60, '中醫正骨師': 60 }[service] || 30;
-            
-            try {
-                const dateStr = typeof date === 'object' ? date.toISOString().split('T')[0] : date; const res = await fetch(API_BASE + '/api/appointments?date=' + dateStr);
-                const data = await res.json();
-                const booked = Array.isArray(data) ? data : (data.appointments || []);
-                
-                // Disable conflicting slots
-                document.querySelectorAll('.time-slot').forEach(slot => {
-                    const time = slot.dataset.time;
-                    const hour = parseInt(time.split(':')[0]);
-                    const minute = parseInt(time.split(':')[1]);
-                    const slotEnd = hour * 60 + minute + duration;
-                    
-                    // Check if any booked slot conflicts
-                    let hasConflict = false;
-                    for (const b of booked) {
-                        const bh = parseInt(b.time.split(':')[0]);
-                        const bm = parseInt(b.time.split(':')[1]);
-                        const bookedEnd = bh * 60 + bm + (b.duration || 30);
-                        if (!(slotEnd <= bh * 60 + bm || hour * 60 + minute >= bookedEnd)) {
-                            hasConflict = true;
-                            break;
-                        }
-                    }
-                    
-                    slot.classList.toggle('disabled', hasConflict);
-                    slot.classList.toggle('selected', false);
-                });
-            } catch(e) {
-                console.log('Error checking conflicts:', e);
-            }
+        // Conflict check DISABLED
         }
 
         // Buttons
