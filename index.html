@@ -1079,6 +1079,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
                         cell.classList.add('selected');
                         bookingData.date = date;
                         selectedDate = date;
+                        checkTimeConflicts();
                         document.getElementById('step3-next').disabled = false;
                     });
                 }
