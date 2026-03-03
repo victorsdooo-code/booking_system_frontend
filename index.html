@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>青苗綜合醫療診所 - 預約系統</title>
     <style>
         :root {
@@ -27,7 +27,6 @@
         }
 
         body {
-        overflow-x: hidden;
             background: var(--background);
             color: var(--text);
             min-height: 100vh;
@@ -55,6 +54,39 @@
             color: var(--accent-light);
             margin-top: 8px;
             font-size: 14px;
+        }
+
+        /* View Toggle Button */
+        .view-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .view-toggle button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .view-toggle button.active {
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .view-toggle button:hover:not(.active) {
+            color: white;
         }
 
         /* Progress Steps - Desktop */
@@ -214,7 +246,7 @@
         }
 
         /* Cards */
-        .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .option-card {
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 12px;
@@ -525,11 +557,6 @@
             font-size: 12px;
         }
 
-        /* Force mobile on small screens */
-        @media (max-width: 768px) {
-            body.mobile-view { display: block !important; }
-        }
-        
         /* ========== Mobile Responsive Styles ========== */
         @media (max-width: 768px) {
             body.mobile-view main {
@@ -546,7 +573,7 @@
                 font-size: 14px;
             }
 
-            body.mobile-view .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+            body.mobile-view .option-card {
                 padding: 16px;
                 margin-bottom: 10px;
             }
@@ -574,9 +601,15 @@
                 font-size: 22px;
             }
 
-            body.mobile-view 
+            body.mobile-view .view-toggle {
+                top: 12px;
+                right: 12px;
+            }
 
-            body.mobile-view 
+            body.mobile-view .view-toggle button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
 
             /* Mobile progress bar - simplified */
             .mobile-progress {
@@ -635,24 +668,16 @@
                 display: none !important;
             }
         }
-    
-        @media (max-width: 768px) {
-            .container { padding: 16px !important; }
-            .option-card, .calendar-day, .time-slot, .btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; } min-height: 80px !important; font-size: 14px !important; }
-            .calendar-day { width: 36px !important; height: 36px !important; }
-            .time-slot { padding: 8px !important; font-size: 12px !important; }
-            .step-container { padding: 20px !important; }
-            h1 { font-size: 24px !important; }
-            .btn { padding: 12px 20px !important; font-size: 14px !important; }
-        }
-
-</style>
+    </style>
 </head>
-<body class="mobile-view">
+<body>
     <header>
         <h1>青苗綜合醫療診所</h1>
         <p>預約系統 v0.1.0</p>
-        
+        <div class="view-toggle">
+            <button id="btn-desktop" class="active" onclick="setViewMode('desktop')">電腦版</button>
+            <button id="btn-mobile" onclick="setViewMode('mobile')">手機版</button>
+        </div>
     </header>
 
     <!-- Desktop Progress -->
@@ -851,7 +876,7 @@
             </div>
             <div class="btn-group">
                 <button class="btn btn-secondary" id="step5-prev">上一步</button>
-                <button class="btn btn-primary" id="submit-booking" onclick="this.disabled=false; submitBooking();">確認預約</button>
+                <button class="btn btn-primary" id="submit-booking" disabled>確認預約</button>
             </div>
         </div>
 
@@ -900,27 +925,34 @@
     </footer>
 
     <script>
-        // Immediate mobile detection
-        (function() {
-            var w = window.innerWidth || document.documentElement.clientWidth || 375;
-            if (w <= 768) {
-                document.body.classList.add('mobile-view');
-            }
-        })();
-    </script>
-    <script>
-        let bookingData = { clinic: null, service: null, date: null, time: null, name: null, phone: null, duration: null };
+        // View Mode Control - Toggle between Desktop and Mobile
+        function setViewMode(mode) {
+            const body = document.body;
+            const btnDesktop = document.getElementById('btn-desktop');
+            const btnMobile = document.getElementById('btn-mobile');
+            const main = document.querySelector('main');
+            const mobileProgress = document.querySelector('.mobile-progress');
+            const desktopProgress = document.querySelector('.progress-container');
 
-
-        const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
-        // Auto-detect mobile on load
-        (function() {
-            var isMobile = window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            if (isMobile) {
-                document.body.classList.add('mobile-view');
+            if (mode === 'mobile') {
+                // Enable mobile view
+                body.classList.add('mobile-view');
+                btnDesktop.classList.remove('active');
+                btnMobile.classList.add('active');
+                main.classList.remove('desktop-mode');
+                main.classList.add('mobile-mode');
+                mobileProgress.style.display = 'flex';
+                desktopProgress.style.display = 'none';
+            } else {
+                // Enable desktop view
+                body.classList.remove('mobile-view');
+                btnDesktop.classList.add('active');
+                btnMobile.classList.remove('active');
+                main.classList.add('desktop-mode');
+                main.classList.remove('mobile-mode');
+                mobileProgress.style.display = 'none';
+                desktopProgress.style.display = 'block';
             }
-        })();
-        
             
             // Save user preference
             localStorage.setItem('booking-view-mode', mode);
@@ -943,7 +975,16 @@
             }
         }
 
-
+        // Booking Data
+        const bookingData = {
+            clinic: null,
+            service: null,
+            duration: null,
+            date: null,
+            time: null,
+            name: null,
+            phone: null
+        };
 
         // Current step
         let currentStep = 1;
@@ -1043,7 +1084,6 @@
                         cell.classList.add('selected');
                         bookingData.date = date;
                         selectedDate = date;
-                        // //
                         document.getElementById('step3-next').disabled = false;
                     });
                 }
@@ -1058,34 +1098,33 @@
         }
 
         // Time Slots
-        const TIME_SLOTS = [
-            '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-            '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-            '17:00', '17:30'
-        ];
-        
         function initTimeSlots() {
             const timeSlots = document.getElementById('time-slots');
-            timeSlots.innerHTML = '';
+            const times = [
+                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+                '17:00', '17:30'
+            ];
             
-            TIME_SLOTS.forEach(time => {
+            times.forEach(time => {
                 const slot = document.createElement('div');
                 slot.className = 'time-slot';
-                slot.dataset.time = time;
                 slot.textContent = time;
-                slot.addEventListener('click', () => {
-                    if (!slot.classList.contains('disabled')) {
+                
+                // Randomly disable some slots for demo
+                if (Math.random() < 0.3) {
+                    slot.classList.add('disabled');
+                } else {
+                    slot.addEventListener('click', () => {
                         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
                         slot.classList.add('selected');
                         bookingData.time = time;
                         document.getElementById('step4-next').disabled = false;
-                    }
-                });
+                    });
+                }
+                
                 timeSlots.appendChild(slot);
             });
-        }
-        
-        // Conflict check DISABLED
         }
 
         // Buttons
@@ -1111,41 +1150,27 @@
             // Form validation
             const nameInput = document.getElementById('name');
             const phoneInput = document.getElementById('phone');
-            const submitBtn = document.getElementById('submit-booking');
             
-            // Initially disable submit button until form is valid
-            // submitBtn.disabled = true;
-            
-            function validateForm() { return true; /* DISABLED FOR TESTING */
+            function validateForm() {
                 const nameValid = nameInput.value.trim().length > 0;
                 const phoneValid = phoneInput.value.trim().length >= 8;
-                const isValid = nameValid && phoneValid;
-                submitBtn.disabled = !isValid;
-                return isValid;
+                document.getElementById('submit-booking').disabled = !(nameValid && phoneValid);
             }
             
             nameInput.addEventListener('input', () => {
-                if(bookingData) bookingData.name = nameInput.value;
                 validateForm();
+                bookingData.name = nameInput.value;
             });
             
             phoneInput.addEventListener('input', () => {
-                bookingData.phone = phoneInput.value;
                 validateForm();
+                bookingData.phone = phoneInput.value;
             });
             
-            // Submit button click handler - clean and direct
-            submitBtn.addEventListener('click', (e) => { e.preventDefault(); submitBtn.disabled = false;
-                 
-                if (validateForm()) {
-                    submitBooking();
-                } else {
-                    
-                }
-            });
-            
+            document.getElementById('submit-booking').addEventListener('click', submitBooking);
             document.getElementById('new-booking').addEventListener('click', resetBooking);
         }
+
         function goToStep(step) {
             // Hide current step
             document.querySelector('.booking-step[data-step="' + currentStep + '"]').classList.remove('active');
@@ -1184,83 +1209,22 @@
         }
 
         function submitBooking() {
-            // Read directly from form inputs
-            const name = document.getElementById('name')?.value || '';
-            const phone = document.getElementById('phone')?.value || '';
+            // Update confirmation
+            document.getElementById('confirm-clinic').textContent = bookingData.clinic;
+            document.getElementById('confirm-service').textContent = bookingData.service;
             
-            // Get selected service
-            const selectedService = document.querySelector('.option-card.selected');
-            const service = selectedService?.dataset?.value || '';
-            
-            // Get selected date
-            const selectedDate = document.querySelector('.calendar-day.selected');
-            const date = selectedDate?.dataset?.date || new Date().toISOString().split('T')[0];
-            
-            // Get selected time
-            const selectedTime = document.querySelector('.time-slot.selected');
-            const time = selectedTime?.dataset?.time || '10:00';
-            
-            const serviceMap = {
-                '中醫師 - 問診': 1,
-                '中醫師 - 治療': 2,
-                '物理治療師': 5,
-                '中醫正骨師': 6
-            };
-            
-            const apiData = {
-                name: name,
-                phone: phone,
-                doctorId: serviceMap[service] || 1,
-                date: date,
-                time: time
-            };
-            
-              //
-            
-            // Show loading state
-            const submitBtn = document.getElementById('submit-booking');
-            submitBtn.textContent = '提交中...'; //
-            // submitBtn.disabled = true;
-            
-            // Call API
-            fetch(API_BASE + '/api/appointments', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(apiData)
-            })
-            .then(response => {
-                // else if (!response.ok) {
-                     throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                
-                
-                
-                // Update confirmation display
-                document.getElementById('confirm-clinic').textContent = bookingData.clinic || '青苗綜合醫療診所';
-                document.getElementById('confirm-service').textContent = service;
-                
-                const dateStr = bookingData.date ? bookingData.date.toLocaleDateString('zh-HK', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    weekday: 'long'
-                }) : date;
-                document.getElementById('confirm-date').textContent = dateStr;
-                document.getElementById('confirm-time').textContent = time;
-                document.getElementById('confirm-name').textContent = name;
-                document.getElementById('confirm-phone').textContent = phone;
-                
-                goToStep(6);
-            })
-            .catch(error => {
-                
-                
-                submitBtn.textContent = '確認預約';
-                submitBtn.disabled = false;
+            const dateStr = bookingData.date.toLocaleDateString('zh-HK', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
             });
+            document.getElementById('confirm-date').textContent = dateStr;
+            document.getElementById('confirm-time').textContent = bookingData.time;
+            document.getElementById('confirm-name').textContent = bookingData.name;
+            document.getElementById('confirm-phone').textContent = bookingData.phone;
+            
+            goToStep(6);
         }
 
         function resetBooking() {
@@ -1281,7 +1245,7 @@
             document.getElementById('step2-next').disabled = true;
             document.getElementById('step3-next').disabled = true;
             document.getElementById('step4-next').disabled = true;
-            
+            document.getElementById('submit-booking').disabled = true;
             
             // Reset to step 1
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'completed'));
