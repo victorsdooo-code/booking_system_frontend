@@ -921,16 +921,6 @@
             }
         })();
         
-         else {
-                // Enable desktop view
-                body.classList.remove('mobile-view');
-                btnDesktop.classList.add('active');
-                btnMobile.classList.remove('active');
-                main.classList.add('desktop-mode');
-                main.classList.remove('mobile-mode');
-                mobileProgress.style.display = 'none';
-                desktopProgress.style.display = 'block';
-            }
             
             // Save user preference
             localStorage.setItem('booking-view-mode', mode);
