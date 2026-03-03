@@ -940,6 +940,13 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
 
 
         const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
+        // Auto-detect mobile on load
+        (function() {
+            if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+                document.body.classList.add('mobile-view');
+            }
+        })();
+        
         // View Mode Control - Toggle between Desktop and Mobile
         function setViewMode(mode) {
             const body = document.body;
