@@ -687,7 +687,7 @@
 
 </style>
 </head>
-<body>
+<body class="">
     <header>
         <h1>青苗綜合醫療診所</h1>
         <p>預約系統 v0.1.0</p>
@@ -941,6 +941,15 @@
         <p>青苗綜合醫療診所 © 2026 | 版本 v0.1.0</p>
     </footer>
 
+    <script>
+        // Immediate mobile detection
+        (function() {
+            var w = window.innerWidth || document.documentElement.clientWidth;
+            if (w <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                document.body.classList.add('mobile-view');
+            }
+        })();
+    </script>
     <script>
 let bookingData = { clinic: null, service: null, date: null, time: null, name: null, phone: null, duration: null };
 
