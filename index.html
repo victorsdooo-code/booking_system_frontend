@@ -1079,7 +1079,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
                         cell.classList.add('selected');
                         bookingData.date = date;
                         selectedDate = date;
-                        // checkTimeConflicts();
+                        // //
                         document.getElementById('step3-next').disabled = false;
                     });
                 }
@@ -1122,7 +1122,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         }
         
         // Check for conflicts based on service duration
-        async function checkTimeConflicts() {
+        async function checkTimeConflicts_DISABLED() {
             const service = bookingData.service;
             const date = bookingData.date;
             if (!service || !date) return;
@@ -1302,7 +1302,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
                 body: JSON.stringify(apiData)
             })
             .then(response => {
-                if (response.status === 409) { alert('該時間已被預約，請選擇其他時間'); return; } else if (!response.ok) {
+                // else if (!response.ok) {
                      throw new Error('Network response was not ok');
                 }
                 return response.json();
