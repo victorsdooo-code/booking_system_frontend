@@ -691,10 +691,7 @@
     <header>
         <h1>青苗綜合醫療診所</h1>
         <p>預約系統 v0.1.0</p>
-        <div class="view-toggle">
-            <button id="btn-desktop" class="active" onclick="setViewMode('desktop')">電腦版</button>
-            <button id="btn-mobile" onclick="setViewMode('mobile')">手機版</button>
-        </div>
+        
     </header>
 
     <!-- Desktop Progress -->
@@ -963,25 +960,7 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
             }
         })();
         
-        // View Mode Control - Toggle between Desktop and Mobile
-        function setViewMode(mode) {
-            const body = document.body;
-            const btnDesktop = document.getElementById('btn-desktop');
-            const btnMobile = document.getElementById('btn-mobile');
-            const main = document.querySelector('main');
-            const mobileProgress = document.querySelector('.mobile-progress');
-            const desktopProgress = document.querySelector('.progress-container');
-
-            if (mode === 'mobile') {
-                // Enable mobile view
-                body.classList.add('mobile-view');
-                btnDesktop.classList.remove('active');
-                btnMobile.classList.add('active');
-                main.classList.remove('desktop-mode');
-                main.classList.add('mobile-mode');
-                mobileProgress.style.display = 'flex';
-                desktopProgress.style.display = 'none';
-            } else {
+         else {
                 // Enable desktop view
                 body.classList.remove('mobile-view');
                 btnDesktop.classList.add('active');
