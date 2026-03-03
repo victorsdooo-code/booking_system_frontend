@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>青苗綜合醫療診所 - 預約系統</title>
     <style>
         :root {
@@ -948,7 +948,8 @@ let bookingData = { clinic: null, service: null, date: null, time: null, name: n
         const API_BASE = 'https://booking-system-backend-2t8v.onrender.com';
         // Auto-detect mobile on load
         (function() {
-            if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+            var isMobile = window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isMobile) {
                 document.body.classList.add('mobile-view');
             }
         })();
