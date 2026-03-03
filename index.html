@@ -900,10 +900,24 @@
     </footer>
 
     <script>
+        (function() {
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-view');
+            }
+        })();
+    </script>
+    <script>
         // Immediate mobile detection
         (function() {
             var w = window.innerWidth || document.documentElement.clientWidth || 375;
             if (w <= 768) {
+                document.body.classList.add('mobile-view');
+            }
+        })();
+    </script>
+    <script>
+        (function() {
+            if (window.innerWidth <= 768) {
                 document.body.classList.add('mobile-view');
             }
         })();
