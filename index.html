@@ -1239,10 +1239,15 @@
                 return response.json();
             })
             .then(data => {
-                
-                
+                console.log('Booking success:', data);
                 
                 // Update confirmation display
+            })
+            .catch(error => {
+                console.error('Booking failed:', error);
+                alert('預約失敗，請稍後再試');
+                submitBtn.textContent = '確認預約';
+            })
                 document.getElementById('confirm-clinic').textContent = bookingData.clinic || '青苗綜合醫療診所';
                 document.getElementById('confirm-service').textContent = service;
                 
